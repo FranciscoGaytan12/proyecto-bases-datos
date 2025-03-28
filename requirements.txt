@@ -1,0 +1,8 @@
+# Install dependencies
+npm i
+
+# Install lucide icons
+npm i lucide-react
+
+# Install Framer motion
+npm i framer-motion
