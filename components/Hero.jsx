@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 
 function Hero() {
   return (
-    <section className="relative bg-gradient-to-br from-amber-500 to-amber-600 text-white overflow-hidden">
+    <section className="relative bg-gradient-to-br from-[#669BBC] to-[#669BBC] text-white overflow-hidden">
       <motion.div
         className="absolute inset-0 z-0"
         initial={{ scale: 1.2, opacity: 0 }}
@@ -51,7 +51,7 @@ function Hero() {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             <motion.button
-              className="bg-white text-amber-600 hover:bg-amber-50 px-6 py-3 rounded-md font-medium transition-colors"
+              className="bg-white text-[#656839] hover:bg-amber-50 px-6 py-3 rounded-md font-medium transition-colors"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
               whileTap={{ scale: 0.95 }}
             >

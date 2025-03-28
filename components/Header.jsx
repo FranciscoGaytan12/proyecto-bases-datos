@@ -21,8 +21,8 @@ function Header() {
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <Shield className="h-8 w-8 text-amber-600" />
-          <span className="ml-2 text-xl font-bold text-gray-800">SeguroTotal</span>
+          <Shield className="h-8 w-8 text-[#656839]" />
+          <span className="ml-2 text-xl font-bold text-gray-800">B&S</span>
         </motion.div>
 
         {/* Mobile menu button */}
@@ -43,7 +43,7 @@ function Header() {
             </Link>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <Link href="#benefits" className="text-gray-700 hover:text-amber-600 transition-colors">
+            <Link href="#benefits" className="text-gray-700 hover:text-green transition-colors">
               Beneficios
             </Link>
           </motion.div>
@@ -53,7 +53,7 @@ function Header() {
             </Link>
           </motion.div>
           <motion.button
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-[#656839]  text-white px-4 py-2 rounded-md transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -111,7 +111,7 @@ function Header() {
                 </Link>
               </motion.div>
               <motion.button
-                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors w-full"
+                className="bg-amber-500 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors w-full"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
