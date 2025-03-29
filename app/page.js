@@ -10,6 +10,7 @@ import About from "@/components/About";
 import Hero from "@/components/Hero";
 import Benefits from "@/components/Benefits";
 import CTA from "@/components/CTA";
+import Login from "@/components/Login";
 
 export default function Home() {
   const { scrollYProgress } = useScroll()
@@ -20,9 +21,12 @@ export default function Home() {
       <motion.div className="fixed top-0 left-0 right-0 h-1 bg-[#656839] z-50" style={{ scaleX: scrollYProgress }} />
 
       <Header />
+      <Login  /> 
         <Hero />
+
         <About />
         <Benefits />
+      
         <CTA />
       <Footer />
     </div>

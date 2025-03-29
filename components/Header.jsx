@@ -1,12 +1,18 @@
 "use client"
 
-import { Shield, Menu, X } from "lucide-react"
+import { Shield, Menu, X, User } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import Link from "next/link"
 
-function Header() {
+function Header({ onLoginClick }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const handleLoginButtonClick = () => {
+    console.log("Login button clicked in Header")
+    if (onLoginClick) {
+      onLoginClick()
+    }
+  }
 
   return (
     <motion.header
@@ -21,8 +27,8 @@ function Header() {
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <Shield className="h-8 w-8 text-[#656839]" />
-          <span className="ml-2 text-xl font-bold text-gray-800">B&S</span>
+          <Shield className="h-8 w-8 text-amber-600" />
+          <span className="ml-2 text-xl font-bold text-gray-800">SeguroTotal</span>
         </motion.div>
 
         {/* Mobile menu button */}
@@ -31,34 +37,45 @@ function Header() {
         </motion.button>
 
         {/* Desktop navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-4">
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <Link href="#" className="text-gray-700 hover:text-amber-600 transition-colors">
+            <a href="#" className="text-gray-700 hover:text-amber-600 transition-colors">
               Inicio
-            </Link>
+            </a>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <Link href="#about" className="text-gray-700 hover:text-amber-600 transition-colors">
+            <a href="#about" className="text-gray-700 hover:text-amber-600 transition-colors">
               Nosotros
-            </Link>
+            </a>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <Link href="#benefits" className="text-gray-700 hover:text-green transition-colors">
+            <a href="#benefits" className="text-gray-700 hover:text-amber-600 transition-colors">
               Beneficios
-            </Link>
+            </a>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <Link href="#contact" className="text-gray-700 hover:text-amber-600 transition-colors">
+            <a href="#contact" className="text-gray-700 hover:text-amber-600 transition-colors">
               Contacto
-            </Link>
+            </a>
           </motion.div>
           <motion.button
-            className="bg-[#656839]  text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
             Cotizar Ahora
+          </motion.button>
+          <motion.button
+            className="flex items-center border border-amber-600 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            onClick={handleLoginButtonClick}
+            type="button"
+          >
+            <User className="h-4 w-4 mr-2" />
+            Iniciar Sesión
           </motion.button>
         </nav>
       </div>
@@ -75,49 +92,65 @@ function Header() {
           >
             <div className="container mx-auto px-4 flex flex-col space-y-4">
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
-                <Link
+                <a
                   href="#"
                   className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Inicio
-                </Link>
+                </a>
               </motion.div>
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                <Link
+                <a
                   href="#about"
                   className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Nosotros
-                </Link>
+                </a>
               </motion.div>
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                <Link
+                <a
                   href="#benefits"
                   className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Beneficios
-                </Link>
+                </a>
               </motion.div>
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-                <Link
+                <a
                   href="#contact"
                   className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Contacto
-                </Link>
+                </a>
               </motion.div>
               <motion.button
-                className="bg-amber-500 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors w-full"
+                className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors w-full"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Cotizar Ahora
+              </motion.button>
+              <motion.button
+                className="flex items-center justify-center border border-amber-600 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-md transition-colors w-full"
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  handleLoginButtonClick()
+                }}
+                type="button"
+              >
+              
+                <User className="h-4 w-4 mr-2" />
+                Iniciar Sesión
               </motion.button>
             </div>
           </motion.div>
