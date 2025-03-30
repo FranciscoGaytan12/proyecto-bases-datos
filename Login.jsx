@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { X, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { X, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react"
+import { authService } from "./services/api"
 
 function Login({ isOpen, onClose }) {
   const [email, setEmail] = useState("")
@@ -9,22 +11,8 @@ function Login({ isOpen, onClose }) {
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [errors, setErrors] = useState({})
-
-  useEffect(() => {
-    console.log("Login component - isOpen changed to:", isOpen)
-
-    // Si el modal está abierto, prevenir el scroll del body
-    if (isOpen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "auto"
-    }
-
-    // Limpiar al desmontar
-    return () => {
-      document.body.style.overflow = "auto"
-    }
-  }, [isOpen])
+  const [isLoading, setIsLoading] = useState(false)
+  const [apiError, setApiError] = useState("")
 
   const validateForm = () => {
     const newErrors = {}
@@ -45,14 +33,34 @@ function Login({ isOpen, onClose }) {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // Limpiar errores previos
+    setApiError("")
+
     if (validateForm()) {
-      console.log("Formulario enviado:", { email, password, rememberMe })
-      // Aquí iría la lógica para enviar los datos al servidor
-      alert("Inicio de sesión exitoso")
-      onClose()
+      setIsLoading(true)
+
+      try {
+        // Llamar al servicio de autenticación
+        const response = await authService.login(email, password)
+
+        console.log("Inicio de sesión exitoso:", response)
+
+        // Si se seleccionó "Recordarme", podríamos guardar alguna preferencia aquí
+
+        // Cerrar el modal
+        onClose()
+
+        // Recargar la página o redirigir al usuario
+        window.location.reload()
+      } catch (error) {
+        console.error("Error al iniciar sesión:", error)
+        setApiError(error.message || "Error al iniciar sesión. Inténtalo de nuevo.")
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -89,31 +97,49 @@ function Login({ isOpen, onClose }) {
     },
   }
 
-  const inputVariants = {
-    focus: { scale: 1.02, transition: { duration: 0.2 } },
-    blur: { scale: 1, transition: { duration: 0.2 } },
-  }
-
-  // Renderizado condicional directo para depuración
-  if (!isOpen) {
-    console.log("Login component - not rendering because isOpen is false")
-    return null
-  }
-
-  console.log("Login component - rendering modal because isOpen is true")
+  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose} />
+      <motion.div
+        className="fixed inset-0 bg-black bg-opacity-50"
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        variants={overlayVariants}
+        onClick={onClose}
+      />
 
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md relative z-10 overflow-hidden">
+      <motion.div
+        className="bg-white rounded-lg shadow-xl w-full max-w-md relative z-10 overflow-hidden"
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        variants={modalVariants}
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Iniciar Sesión</h2>
-            <button className="text-gray-500 hover:text-gray-700" onClick={onClose}>
+            <motion.button
+              className="text-gray-500 hover:text-gray-700"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onClose}
+            >
               <X className="h-6 w-6" />
-            </button>
+            </motion.button>
           </div>
+
+          {apiError && (
+            <motion.div
+              className="mb-6 p-3 bg-red-50 border border-red-200 rounded-md flex items-start"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-sm text-red-600">{apiError}</p>
+            </motion.div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -131,9 +157,18 @@ function Login({ isOpen, onClose }) {
                   onChange={(e) => setEmail(e.target.value)}
                   className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
                   placeholder="tu@email.com"
+                  disabled={isLoading}
                 />
               </div>
-              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+              {errors.email && (
+                <motion.p
+                  className="mt-1 text-sm text-red-600"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.email}
+                </motion.p>
+              )}
             </div>
 
             <div>
@@ -151,18 +186,30 @@ function Login({ isOpen, onClose }) {
                   onChange={(e) => setPassword(e.target.value)}
                   className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
                   placeholder="••••••••"
+                  disabled={isLoading}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="text-gray-400 hover:text-gray-500"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    disabled={isLoading}
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
+                  </motion.button>
                 </div>
               </div>
-              {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
+              {errors.password && (
+                <motion.p
+                  className="mt-1 text-sm text-red-600"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.password}
+                </motion.p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -173,24 +220,33 @@ function Login({ isOpen, onClose }) {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                  disabled={isLoading}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Recordarme
                 </label>
               </div>
 
-              <a href="#" className="text-sm font-medium text-amber-600 hover:text-amber-500">
+              <motion.a
+                href="#"
+                className="text-sm font-medium text-amber-600 hover:text-amber-500"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 ¿Olvidaste tu contraseña?
-              </a>
+              </motion.a>
             </div>
 
             <div>
-              <button
+              <motion.button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-amber-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
+                whileHover={!isLoading ? { scale: 1.02 } : {}}
+                whileTap={!isLoading ? { scale: 0.98 } : {}}
+                disabled={isLoading}
               >
-                Iniciar Sesión
-              </button>
+                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+              </motion.button>
             </div>
           </form>
 
@@ -205,16 +261,19 @@ function Login({ isOpen, onClose }) {
             </div>
 
             <div className="mt-6">
-              <button
+              <motion.button
                 type="button"
                 className="w-full flex justify-center py-2 px-4 border border-amber-600 rounded-md shadow-sm text-sm font-medium text-amber-600 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                disabled={isLoading}
               >
                 Crear una cuenta
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
