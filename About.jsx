@@ -78,7 +78,7 @@ function About() {
                   whileHover={{ x: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <ChevronRight className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                   <span className="ml-2 text-gray-600">Integridad y transparencia en cada acción</span>
                 </motion.li>
                 <motion.li
@@ -87,7 +87,7 @@ function About() {
                   whileHover={{ x: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <ChevronRight className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                   <span className="ml-2 text-gray-600">Compromiso con la satisfacción del cliente</span>
                 </motion.li>
                 <motion.li
@@ -96,7 +96,7 @@ function About() {
                   whileHover={{ x: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <ChevronRight className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                   <span className="ml-2 text-gray-600">Innovación constante en nuestros servicios</span>
                 </motion.li>
                 <motion.li
@@ -105,13 +105,13 @@ function About() {
                   whileHover={{ x: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <ChevronRight className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <ChevronRight className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                   <span className="ml-2 text-gray-600">Responsabilidad social y ambiental</span>
                 </motion.li>
               </ul>
             </motion.div>
             <motion.button
-              className="flex items-center text-amber-600 hover:text-amber-700 font-medium transition-colors"
+              className="flex items-center text-blue-400 font-medium transition-colors"
               variants={fadeIn}
               whileHover={{ x: 5 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}

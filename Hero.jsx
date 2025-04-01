@@ -142,7 +142,7 @@ function Hero() {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             <motion.button
-              className="bg-[#607744]  text-white px-6 py-3 rounded-md font-medium transition-colors"
+              className="bg-blue-400 text-white px-6 py-3 rounded-md font-medium transition-colors"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
               whileTap={{ scale: 0.95 }}
             >
@@ -167,7 +167,7 @@ function Hero() {
               key={index}
               onClick={() => handleManualNavigation(() => setCurrentIndex(index))}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex ? "bg-amber-500 w-8" : "bg-white/50 hover:bg-white/80"
+                index === currentIndex ? "bg-blue-400 w-8" : "bg-white/50 hover:bg-white/80"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />

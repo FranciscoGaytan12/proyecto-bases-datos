@@ -10,7 +10,7 @@ const dotenv = require("dotenv")
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 3306
 
 // Middleware
 app.use(cors())
@@ -21,7 +21,7 @@ const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "segurototal",
+  database: process.env.DB_NAME || "seguroTotal",// Cambia esto por el nombre de tu base de datos
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

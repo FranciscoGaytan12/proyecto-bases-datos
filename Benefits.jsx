@@ -70,7 +70,7 @@ function Benefits() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              <Shield className="h-12 w-12 text-amber-600 mb-4" />
+              <Shield className="h-12 w-12 text-blue-400 mb-4" />
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Cobertura Completa</h3>
             <p className="text-gray-600">
@@ -86,7 +86,7 @@ function Benefits() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <Clock className="h-12 w-12 text-amber-600 mb-4" />
+              <Clock className="h-12 w-12 text-blue-400 mb-4" />
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Atención 24/7</h3>
             <p className="text-gray-600">
@@ -102,7 +102,7 @@ function Benefits() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
             >
-              <Award className="h-12 w-12 text-amber-600 mb-4" />
+              <Award className="h-12 w-12 text-blue-400 mb-4" />
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Servicio Premium</h3>
             <p className="text-gray-600">
@@ -117,7 +117,7 @@ function Benefits() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
             >
-              <Users className="h-12 w-12 text-amber-600 mb-4" />
+              <Users className="h-12 w-12 text-blue-400 mb-4" />
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Asesores Expertos</h3>
             <p className="text-gray-600">
@@ -132,7 +132,7 @@ function Benefits() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.5 }}
             >
-              <Heart className="h-12 w-12 text-amber-600 mb-4" />
+              <Heart className="h-12 w-12 text-blue-400 mb-4" />
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Planes Familiares</h3>
             <p className="text-gray-600">
@@ -148,7 +148,7 @@ function Benefits() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.5 }}
             >
-              <Mail className="h-12 w-12 text-amber-600 mb-4" />
+              <Mail className="h-12 w-12 text-blue-400 mb-4" />
             </motion.div>
             <h3 className="text-xl font-semibold text-gray-800 mb-3">Trámites Sencillos</h3>
             <p className="text-gray-600">

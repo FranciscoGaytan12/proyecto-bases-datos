@@ -76,7 +76,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
         setTimeout(() => {
           onClose()
           if (onLoginClick) onLoginClick()
-        }, 3000)
+        }, 5008)
       } catch (error) {
         console.error("Error al registrar:", error)
         setApiError(error.message || "Error al registrar. Inténtalo de nuevo.")

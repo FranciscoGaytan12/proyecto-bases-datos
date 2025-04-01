@@ -39,7 +39,7 @@ function CTA() {
           </motion.p>
           <motion.div className="flex flex-col sm:flex-row gap-4 justify-center" variants={fadeIn}>
             <motion.button
-              className="bg-white text-[#607744] hover:bg-amber-50 px-8 py-3 rounded-md font-medium transition-colors"
+              className="bg-white text-blue-400 hover:bg-amber-50 px-8 py-3 rounded-md font-medium transition-colors"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
               whileTap={{ scale: 0.95 }}
             >

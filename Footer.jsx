@@ -20,7 +20,7 @@ function Footer() {
               whileHover={{ x: 5 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <Shield className="h-8 w-8 text-amber-500" />
+              <Shield className="h-8 w-8 text-blue-400" />
               <span className="ml-2 text-xl font-bold">SeguroTotal</span>
             </motion.div>
             <p className="text-gray-400 mb-4">
@@ -162,7 +162,7 @@ function Footer() {
                 whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Phone className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                <Phone className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <span className="ml-3 text-gray-400">+1 (800) 123-4567</span>
               </motion.li>
               <motion.li
@@ -170,7 +170,7 @@ function Footer() {
                 whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <Mail className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                <Mail className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <span className="ml-3 text-gray-400">contacto@segurototal.com</span>
               </motion.li>
               <motion.li
@@ -178,7 +178,7 @@ function Footer() {
                 whileHover={{ x: 5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <MapPin className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
+                <MapPin className="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" />
                 <span className="ml-3 text-gray-400">
                   Av. Principal 123, Ciudad Central
                   <br />
