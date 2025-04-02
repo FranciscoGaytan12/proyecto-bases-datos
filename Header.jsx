@@ -15,9 +15,9 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
       transition={{ duration: 0.5 }}
       className="sticky top-0 z-40 bg-white shadow-sm"
     >
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between ">
         <motion.div
-          className="flex items-center"
+          className="flex items-center "
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
@@ -64,7 +64,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
           {isAuthenticated ? (
             <div className="relative">
               <motion.button
-                className="flex items-center border border-blue-400 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center border border-blue-400 text-black hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}

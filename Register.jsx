@@ -325,7 +325,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
             <div className="pt-2">
               <motion.button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || success ? "bg-[#cad6c5] cursor-not-allowed" : "bg-[#B4C4AE] hover:bg-[#a3b39d]"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || success ? "bg-blue-400 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]`}
                 whileHover={!isLoading && !success ? { scale: 1.02 } : {}}
                 whileTap={!isLoading && !success ? { scale: 0.98 } : {}}
                 disabled={isLoading || success}
@@ -348,7 +348,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
             <div className="mt-6">
               <motion.button
                 type="button"
-                className="w-full flex justify-center py-2 px-4 border border-[#B4C4AE] rounded-md shadow-sm text-sm font-medium text-[#B4C4AE] bg-white hover:bg-[#f0f4ee] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]"
+                className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-md shadow-sm text-sm font-medium text-black bg-white ] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {

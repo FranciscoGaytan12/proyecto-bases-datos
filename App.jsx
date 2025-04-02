@@ -53,7 +53,7 @@ function App() {
   return (
     <div className="min-h-screen bg-amber-50">
       {/* Barra de progreso */}
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-amber-600 z-50" style={{ scaleX: scrollYProgress }} />
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-blue-400 z-50" style={{ scaleX: scrollYProgress }} />
 
       <Header
         onLoginClick={handleLoginClick}
