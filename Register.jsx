@@ -76,10 +76,28 @@ function Register({ isOpen, onClose, onLoginClick }) {
         setTimeout(() => {
           onClose()
           if (onLoginClick) onLoginClick()
-        }, 5008)
+        }, 3000)
       } catch (error) {
         console.error("Error al registrar:", error)
-        setApiError(error.message || "Error al registrar. Inténtalo de nuevo.")
+
+        // Mostrar detalles completos del error
+        if (error.response) {
+          // El servidor respondió con un código de estado fuera del rango 2xx
+          console.error("Datos del error:", error.response.data)
+          console.error("Estado HTTP:", error.response.status)
+          console.error("Cabeceras:", error.response.headers)
+          setApiError(
+            error.response.data.message || error.response.data.error || "Error al registrar. Inténtalo de nuevo.",
+          )
+        } else if (error.request) {
+          // La petición fue hecha pero no se recibió respuesta
+          console.error("No se recibió respuesta del servidor:", error.request)
+          setApiError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
+        } else {
+          // Algo ocurrió al configurar la petición
+          console.error("Error de configuración:", error.message)
+          setApiError("Error al procesar la solicitud: " + error.message)
+        }
       } finally {
         setIsLoading(false)
       }
@@ -189,7 +207,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
                   placeholder="Juan Pérez"
                   disabled={isLoading || success}
                 />
@@ -218,7 +236,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
                   placeholder="tu@email.com"
                   disabled={isLoading || success}
                 />
@@ -247,7 +265,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
+                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
                   placeholder="••••••••"
                   disabled={isLoading || success}
                 />
@@ -288,7 +306,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type={showPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.confirmPassword ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.confirmPassword ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
                   placeholder="••••••••"
                   disabled={isLoading || success}
                 />
@@ -307,7 +325,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
             <div className="pt-2">
               <motion.button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || success ? "bg-amber-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || success ? "bg-[#cad6c5] cursor-not-allowed" : "bg-[#B4C4AE] hover:bg-[#a3b39d]"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]`}
                 whileHover={!isLoading && !success ? { scale: 1.02 } : {}}
                 whileTap={!isLoading && !success ? { scale: 0.98 } : {}}
                 disabled={isLoading || success}
@@ -330,7 +348,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
             <div className="mt-6">
               <motion.button
                 type="button"
-                className="w-full flex justify-center py-2 px-4 border border-amber-600 rounded-md shadow-sm text-sm font-medium text-amber-600 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                className="w-full flex justify-center py-2 px-4 border border-[#B4C4AE] rounded-md shadow-sm text-sm font-medium text-[#B4C4AE] bg-white hover:bg-[#f0f4ee] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
