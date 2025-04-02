@@ -214,7 +214,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
               ) : (
                 <>
                   <motion.button
-                    className="flex items-center justify-center border border-blue-400 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-md transition-colors w-full"
+                    className="flex items-center justify-center border border-blue-400 text-black hover:bg-amber-50 px-4 py-2 rounded-md transition-colors w-full"
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.6 }}
