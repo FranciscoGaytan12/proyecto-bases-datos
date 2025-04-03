@@ -132,7 +132,7 @@ function UserProfile() {
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="w-full bg-[#B4C4AE] hover:bg-[#a3b39d] text-white py-2 rounded-md transition-colors"
+            className="w-full bg-blue-400  text-white py-2 rounded-md transition-colors"
           >
             Reintentar
           </button>
@@ -146,19 +146,19 @@ function UserProfile() {
       <div className="container mx-auto px-4 py-12">
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           {/* Encabezado del perfil */}
-          <div className="bg-[#B4C4AE] text-white p-6">
+          <div className="bg-blue-400 text-black p-6">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="flex items-center mb-4 md:mb-0">
-                <div className="bg-white text-[#B4C4AE] rounded-full p-3 mr-4">
+                <div className="bg-white text-black rounded-full p-3 mr-4">
                   <User className="h-8 w-8" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">{user?.name || "Usuario"}</h1>
-                  <p className="text-amber-50">{user?.email}</p>
+                  <p className="text-black ">{user?.email}</p>
                 </div>
               </div>
               <motion.button
-                className="flex items-center bg-white text-[#B4C4AE] px-4 py-2 rounded-md font-medium transition-colors"
+                className="flex items-center bg-white text-black px-4 py-2 rounded-md font-medium transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleLogout}
@@ -203,7 +203,7 @@ function UserProfile() {
 
                   {loadingPolicies ? (
                     <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B4C4AE] mx-auto"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-100 mx-auto"></div>
                       <p className="mt-4 text-gray-600">Cargando pólizas...</p>
                     </div>
                   ) : policies.length > 0 ? (
@@ -214,11 +214,11 @@ function UserProfile() {
                     </div>
                   ) : (
                     <div className="text-center py-8 bg-gray-50 rounded-lg">
-                      <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <Shield className="h-12 w-12 text-blue-500 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-800 mb-2">No tienes pólizas activas</h3>
                       <p className="text-gray-600 mb-4">Contrata tu primera póliza para proteger lo que más valoras.</p>
                       <motion.button
-                        className="bg-[#B4C4AE] hover:bg-[#a3b39d] text-white px-4 py-2 rounded-md transition-colors"
+                        className="bg-blue-400  text-white px-4 py-2 rounded-md transition-colors"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >

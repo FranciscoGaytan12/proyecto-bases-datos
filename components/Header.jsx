@@ -21,7 +21,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <Shield className="h-8 w-8 text-[#B4C4AE]" />
+          <Shield className="h-8 w-8 text-blue-500" />
           <span className="ml-2 text-xl font-bold text-gray-800">B&S</span>
         </motion.div>
 
@@ -33,7 +33,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
         {/* Desktop navigation */}
         <nav className="hidden md:flex items-center space-x-4">
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <a href="#" className="text-gray-700 hover:text-[#B4C4AE] transition-colors">
+            <a href="#" className="text-gray-700 hover:text-[#000000] transition-colors">
               Inicio
             </a>
           </motion.div>
@@ -53,7 +53,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
             </a>
           </motion.div>
           <motion.button
-            className="bg-[#B4C4AE] hover:bg-[#a3b39d] text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-blue-400 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -64,7 +64,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
           {isAuthenticated ? (
             <div className="relative">
               <motion.button
-                className="flex items-center border border-amber-600 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center border border-blue-400 text-black hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -77,7 +77,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
               <AnimatePresence>
                 {isProfileMenuOpen && (
                   <motion.div
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                    className="absolute right-0 mt-2 w-48 bg-blue-400 rounded-md shadow-lg py-1 z-10 border border-gray-200"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -121,7 +121,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
                 Iniciar Sesión
               </motion.button>
               <motion.button
-                className="flex items-center bg-[#e8efe5] text-[#5c6a58] hover:bg-[#dbe5d7] px-4 py-2 rounded-md transition-colors"
+                className="flex items-center bg-blue-400 text-white hover:bg-[#dbe5d7] px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -227,7 +227,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
               ) : (
                 <>
                   <motion.button
-                    className="flex items-center justify-center border-blue-400 text-black hover:bg-[#f0f4ee] px-4 py-2 rounded-md transition-colors w-full"
+                    className="flex items-center justify-center border-blue-400 text-black  hover:bg-[#f0f4ee] px-4 py-2 rounded-md transition-colors w-full"
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.6 }}

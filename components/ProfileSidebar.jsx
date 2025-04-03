@@ -30,7 +30,7 @@ function ProfileSidebar({ activeTab, setActiveTab }) {
             <li key={tab.id}>
               <motion.button
                 className={`w-full flex items-center p-3 rounded-md transition-colors ${
-                  activeTab === tab.id ? "bg-[#B4C4AE] text-white" : "text-gray-700 hover:bg-gray-100"
+                  activeTab === tab.id ? "bg-blue-400 text-white" : "text-gray-700 hover:bg-gray-100"
                 }`}
                 whileHover={{ x: activeTab !== tab.id ? 5 : 0 }}
                 whileTap={{ scale: 0.98 }}
