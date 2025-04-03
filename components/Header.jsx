@@ -4,7 +4,7 @@ import { Shield, Menu, X, User, LogOut } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
-function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user }) {
+function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAuthenticated, user }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
 
@@ -15,13 +15,13 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
       transition={{ duration: 0.5 }}
       className="sticky top-0 z-40 bg-white shadow-sm"
     >
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between ">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <motion.div
-          className="flex items-center "
+          className="flex items-center"
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400, damping: 10 }}
         >
-          <Shield className="h-8 w-8 text-blue-400" />
+          <Shield className="h-8 w-8 text-[#B4C4AE]" />
           <span className="ml-2 text-xl font-bold text-gray-800">B&S</span>
         </motion.div>
 
@@ -31,29 +31,29 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
         </motion.button>
 
         {/* Desktop navigation */}
-        <nav className="hidden md:flex items-center space-x-4 px-">
+        <nav className="hidden md:flex items-center space-x-4">
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <a href="#" className="text-gray-700  transition-colors">
+            <a href="#" className="text-gray-700 hover:text-[#B4C4AE] transition-colors">
               Inicio
             </a>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <a href="#about" className="text-gray-700  transition-colors">
+            <a href="#about" className="text-gray-700 hover:text-[#B4C4AE] transition-colors">
               Nosotros
             </a>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <a href="#benefits" className="text-gray-700  transition-colors">
+            <a href="#benefits" className="text-gray-700 hover:text-[#B4C4AE] transition-colors">
               Beneficios
             </a>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-            <a href="#contact" className="text-gray-700  transition-colors">
+            <a href="#contact" className="text-gray-700 hover:text-[#B4C4AE] transition-colors">
               Contacto
             </a>
           </motion.div>
           <motion.button
-            className="bg-blue-400 text-white px-4 py-2 rounded-md transition-colors"
+            className="bg-[#B4C4AE] hover:bg-[#a3b39d] text-white px-4 py-2 rounded-md transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -64,7 +64,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
           {isAuthenticated ? (
             <div className="relative">
               <motion.button
-                className="flex items-center border border-blue-400 text-black hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center border border-amber-600 text-amber-600 hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -83,9 +83,17 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50">
+                    <button
+                      onClick={() => {
+                        setIsProfileMenuOpen(false)
+                        if (typeof onProfileClick === "function") {
+                          onProfileClick()
+                        }
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-amber-50"
+                    >
                       Mi Perfil
-                    </a>
+                    </button>
                     <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50">
                       Mis Pólizas
                     </a>
@@ -103,7 +111,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
           ) : (
             <>
               <motion.button
-                className="flex items-center border border-blue-400 text-blue-400  px-4 py-2 rounded-md transition-colors"
+                className="flex items-center border border-[#B4C4AE] text-black hover:bg-[#f0f4ee] px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -113,8 +121,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
                 Iniciar Sesión
               </motion.button>
               <motion.button
-                className="flex items-center bg-blue-400 text-white
-                 hover:bg-amber-200 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center bg-[#e8efe5] text-[#5c6a58] hover:bg-[#dbe5d7] px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -141,7 +148,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
                 <a
                   href="#"
-                  className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
+                  className="text-gray-700  transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Inicio
@@ -150,7 +157,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
                 <a
                   href="#about"
-                  className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
+                  className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Nosotros
@@ -159,7 +166,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
                 <a
                   href="#benefits"
-                  className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
+                  className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Beneficios
@@ -168,14 +175,14 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
               <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
                 <a
                   href="#contact"
-                  className="text-gray-700 hover:text-amber-600 transition-colors py-2 block"
+                  className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Contacto
                 </a>
               </motion.div>
               <motion.button
-                className="bg-blue-400 hover:bg-amber-700 text-white px-4 py-2 rounded-md transition-colors w-full"
+                className="bg-blue-400 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors w-full"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
@@ -193,10 +200,16 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
                     className="border-t border-gray-200 pt-2"
                   >
                     <p className="text-gray-500 text-sm mb-2">Conectado como: {user?.name || "Usuario"}</p>
-                    <a href="#" className="text-gray-700 hover:text-amber-600 transition-colors py-2 block">
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false)
+                        onProfileClick()
+                      }}
+                      className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block"
+                    >
                       Mi Perfil
-                    </a>
-                    <a href="#" className="text-gray-700 hover:text-amber-600 transition-colors py-2 block">
+                    </button>
+                    <a href="#" className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block">
                       Mis Pólizas
                     </a>
                     <button
@@ -214,7 +227,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
               ) : (
                 <>
                   <motion.button
-                    className="flex items-center justify-center border border-blue-400 text-black hover:bg-amber-50 px-4 py-2 rounded-md transition-colors w-full"
+                    className="flex items-center justify-center border-blue-400 text-black hover:bg-[#f0f4ee] px-4 py-2 rounded-md transition-colors w-full"
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.6 }}
@@ -228,7 +241,7 @@ function Header({ onLoginClick, onRegisterClick, onLogout, isAuthenticated, user
                     Iniciar Sesión
                   </motion.button>
                   <motion.button
-                    className="flex items-center justify-center bg-amber-100 text-[amber-800] hover:bg-amber-200 px-4 py-2 rounded-md transition-colors w-full"
+                    className="flex items-center justify-center bg-[#e8efe5] text-black  px-4 py-2 rounded-md transition-colors w-full"
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: 0.7 }}

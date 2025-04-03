@@ -5,18 +5,25 @@ import axios from "axios"
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
 console.log("API URL configurada:", API_URL)
 
-// Crear instancia de axios con logs
+// Crear instancia de axios con logs y configuración mejorada
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  // Aumentar el timeout para dar más tiempo a las peticiones
+  timeout: 15000,
+  // Permitir credenciales para CORS
+  withCredentials: false,
 })
 
 // Agregar interceptor para mostrar las peticiones
 api.interceptors.request.use(
   (config) => {
-    console.log(`Enviando petición ${config.method.toUpperCase()} a ${config.url}`, config.data)
+    console.log(
+      `[${new Date().toISOString()}] Enviando petición ${config.method?.toUpperCase()} a ${config.url}`,
+      config.data,
+    )
     // Verificar si estamos en el navegador antes de acceder a localStorage
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token")
@@ -27,7 +34,7 @@ api.interceptors.request.use(
     return config
   },
   (error) => {
-    console.error("Error en la petición:", error)
+    console.error("[REQUEST ERROR]", error)
     return Promise.reject(error)
   },
 )
@@ -35,26 +42,58 @@ api.interceptors.request.use(
 // Interceptor para mostrar las respuestas
 api.interceptors.response.use(
   (response) => {
-    console.log(`Respuesta de ${response.config.url}:`, response.data)
+    console.log(`[${new Date().toISOString()}] Respuesta de ${response.config.url}:`, response.data)
     return response
   },
   (error) => {
-    console.error("Error en la respuesta:", error)
+    console.error("[RESPONSE ERROR]", error)
+
+    // Información detallada del error
     if (error.response) {
+      // El servidor respondió con un código de estado fuera del rango 2xx
       console.error("Datos del error:", error.response.data)
       console.error("Estado HTTP:", error.response.status)
+      console.error("Cabeceras:", error.response.headers)
+
+      // Devolver un mensaje de error más descriptivo
+      return Promise.reject({
+        message: error.response.data?.message || `Error del servidor: ${error.response.status}`,
+        status: error.response.status,
+        data: error.response.data,
+      })
+    } else if (error.request) {
+      // La petición fue hecha pero no se recibió respuesta
+      console.error("No se recibió respuesta del servidor:", error.request)
+
+      // Verificar si el error es por CORS o timeout
+      if (error.code === "ECONNABORTED") {
+        return Promise.reject({
+          message: "La conexión con el servidor ha expirado. Verifica que el servidor esté respondiendo.",
+          code: error.code,
+        })
+      } else if (error.message && error.message.includes("Network Error")) {
+        return Promise.reject({
+          message: "Error de red. Verifica tu conexión a internet y que el servidor esté en ejecución.",
+          code: "NETWORK_ERROR",
+        })
+      }
+
+      return Promise.reject({
+        message: "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.",
+        code: error.code || "NO_RESPONSE",
+      })
+    } else {
+      // Algo ocurrió al configurar la petición
+      console.error("Error de configuración:", error.message)
+
+      return Promise.reject({
+        message: error.message || "Error al procesar la solicitud",
+        code: "CONFIG_ERROR",
+      })
     }
-    // Manejar errores de autenticación (token expirado, etc.)
-    if (error.response && error.response.status === 401 && typeof window !== "undefined") {
-      // Limpiar datos de sesión
-      localStorage.removeItem("token")
-      localStorage.removeItem("user")
-    }
-    return Promise.reject(error)
   },
 )
 
-// Agregar logs para depuraci��n
 // Servicio de autenticación
 export const authService = {
   // Iniciar sesión
@@ -66,7 +105,19 @@ export const authService = {
       // Verificar que la URL de la API sea correcta
       if (!API_URL || !API_URL.startsWith("http")) {
         console.error("Error: URL de API inválida:", API_URL)
-        throw new Error("URL de API inválida. Verifica la variable de entorno NEXT_PUBLIC_API_URL")
+        throw {
+          message: "URL de API inválida. Verifica la variable de entorno NEXT_PUBLIC_API_URL",
+          code: "INVALID_URL",
+        }
+      }
+
+      // Intentar hacer una petición de prueba primero
+      try {
+        await api.get("/test")
+        console.log("✅ Conexión a la API establecida correctamente")
+      } catch (testError) {
+        console.error("❌ Error al conectar con la API:", testError)
+        // No lanzar error aquí, continuar con el intento de login
       }
 
       const response = await api.post("/login", { email, password })
@@ -80,18 +131,15 @@ export const authService = {
     } catch (error) {
       console.error("Error completo al iniciar sesión:", error)
 
-      // Mostrar información detallada del error
-      if (error.response) {
-        console.error("Datos del error:", error.response.data)
-        console.error("Estado HTTP:", error.response.status)
-        console.error("Cabeceras:", error.response.headers)
-        throw error.response.data || { message: "Error en la respuesta del servidor" }
-      } else if (error.request) {
-        console.error("No se recibió respuesta:", error.request)
-        throw { message: "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución." }
-      } else {
-        console.error("Error de configuración:", error.message)
-        throw { message: "Error al configurar la solicitud: " + error.message }
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+
+      // Si llegamos aquí, es un error no manejado
+      throw {
+        message: "Error inesperado al iniciar sesión. Por favor, inténtalo de nuevo.",
+        code: "UNEXPECTED_ERROR",
       }
     }
   },
@@ -105,11 +153,11 @@ export const authService = {
       return response.data
     } catch (error) {
       console.error("Error completo al registrar:", error)
-      if (error.response) {
-        console.error("Datos del error:", error.response.data)
-        console.error("Estado HTTP:", error.response.status)
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
       }
-      throw error.response?.data || { message: "Error al conectar con el servidor" }
+      throw { message: "Error al registrar usuario. Por favor, inténtalo de nuevo." }
     }
   },
 
@@ -126,7 +174,14 @@ export const authService = {
     if (typeof window !== "undefined") {
       const userStr = localStorage.getItem("user")
       if (userStr) {
-        return JSON.parse(userStr)
+        try {
+          return JSON.parse(userStr)
+        } catch (e) {
+          console.error("Error al parsear usuario:", e)
+          // Si hay un error al parsear, limpiar el localStorage
+          localStorage.removeItem("user")
+          return null
+        }
       }
     }
     return null
@@ -146,7 +201,48 @@ export const authService = {
       const response = await api.get("/profile")
       return response.data
     } catch (error) {
-      throw error.response?.data || { message: "Error al conectar con el servidor" }
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al obtener perfil de usuario" }
+    }
+  },
+
+  // Actualizar información del perfil
+  updateProfile: async (profileData) => {
+    try {
+      const response = await api.put("/profile", profileData)
+
+      // Actualizar usuario en localStorage
+      if (typeof window !== "undefined") {
+        const userStr = localStorage.getItem("user")
+        if (userStr) {
+          const user = JSON.parse(userStr)
+          const updatedUser = { ...user, ...profileData }
+          localStorage.setItem("user", JSON.stringify(updatedUser))
+        }
+      }
+
+      return response.data
+    } catch (error) {
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al actualizar perfil de usuario" }
+    }
+  },
+
+  // Cambiar contraseña
+  changePassword: async (passwordData) => {
+    try {
+      const response = await api.post("/change-password", passwordData)
+      return response.data
+    } catch (error) {
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al cambiar contraseña" }
     }
   },
 }
@@ -159,7 +255,12 @@ export const policyService = {
       const response = await api.get("/policies")
       return response.data.policies
     } catch (error) {
-      throw error.response?.data || { message: "Error al obtener pólizas" }
+      console.error("Error al obtener pólizas:", error)
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al obtener pólizas" }
     }
   },
 
@@ -169,7 +270,11 @@ export const policyService = {
       const response = await api.get(`/policies/${policyId}`)
       return response.data
     } catch (error) {
-      throw error.response?.data || { message: "Error al obtener detalles de la póliza" }
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al obtener detalles de la póliza" }
     }
   },
 
@@ -179,7 +284,11 @@ export const policyService = {
       const response = await api.post("/policies", policyData)
       return response.data
     } catch (error) {
-      throw error.response?.data || { message: "Error al crear póliza" }
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al crear póliza" }
     }
   },
 }
@@ -192,7 +301,11 @@ export const adminService = {
       const response = await api.get("/admin/users")
       return response.data.users
     } catch (error) {
-      throw error.response?.data || { message: "Error al obtener usuarios" }
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al obtener usuarios" }
     }
   },
 }

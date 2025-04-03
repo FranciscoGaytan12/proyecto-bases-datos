@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react"
-import { authService } from "./services/api"
+import { authService } from "../services/api"
 
 function Login({ isOpen, onClose }) {
   const [email, setEmail] = useState("")
