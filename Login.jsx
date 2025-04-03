@@ -219,7 +219,7 @@ function Login({ isOpen, onClose }) {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                  className="h-4 w-4 text- focus:ring-amber-500 border-gray-300 rounded"
                   disabled={isLoading}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -229,7 +229,7 @@ function Login({ isOpen, onClose }) {
 
               <motion.a
                 href="#"
-                className="text-sm font-medium text-amber-600 hover:text-amber-500"
+                className="text-sm font-medium text-black hover:text-amber-500"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -240,7 +240,7 @@ function Login({ isOpen, onClose }) {
             <div>
               <motion.button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-amber-400 cursor-not-allowed" : "bg-amber-600 hover:bg-amber-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
                 whileHover={!isLoading ? { scale: 1.02 } : {}}
                 whileTap={!isLoading ? { scale: 0.98 } : {}}
                 disabled={isLoading}
@@ -263,7 +263,7 @@ function Login({ isOpen, onClose }) {
             <div className="mt-6">
               <motion.button
                 type="button"
-                className="w-full flex justify-center py-2 px-4 border border-amber-600 rounded-md shadow-sm text-sm font-medium text-amber-600 bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-md shadow-sm text-sm font-medium text-black  bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={isLoading}
