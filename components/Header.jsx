@@ -64,7 +64,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
           {isAuthenticated ? (
             <div className="relative">
               <motion.button
-                className="flex items-center border border-blue-400 text-black hover:bg-amber-50 px-4 py-2 rounded-md transition-colors"
+                className="flex items-center border border-blue-400 text-black  px-4 py-2 rounded-md transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
@@ -77,7 +77,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
               <AnimatePresence>
                 {isProfileMenuOpen && (
                   <motion.div
-                    className="absolute right-0 mt-2 w-48 bg-blue-400 rounded-md shadow-lg py-1 z-10 border border-gray-200"
+                    className="absolute right-0 mt-2 w-48 bg-white  rounded-md shadow-lg py-1 z-10 border border-gray-200"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -205,11 +205,11 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onLogout, isAut
                         setIsMenuOpen(false)
                         onProfileClick()
                       }}
-                      className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block"
+                      className="text-gray-700  transition-colors py-2 block"
                     >
                       Mi Perfil
                     </button>
-                    <a href="#" className="text-gray-700 hover:text-[#B4C4AE] transition-colors py-2 block">
+                    <a href="#" className="text-gray-700 transition-colors py-2 block">
                       Mis Pólizas
                     </a>
                     <button
