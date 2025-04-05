@@ -281,14 +281,58 @@ export const policyService = {
   // Crear una nueva póliza
   createPolicy: async (policyData) => {
     try {
+      console.log("Creando nueva póliza:", policyData)
       const response = await api.post("/policies", policyData)
+      return response.data
+    } catch (error) {
+      console.error("Error al crear póliza:", error)
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al crear póliza" }
+    }
+  },
+
+  // Actualizar una póliza existente
+  updatePolicy: async (policyId, policyData) => {
+    try {
+      const response = await api.put(`/policies/${policyId}`, policyData)
       return response.data
     } catch (error) {
       // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
       if (error.message) {
         throw error
       }
-      throw { message: "Error al crear póliza" }
+      throw { message: "Error al actualizar póliza" }
+    }
+  },
+
+  // Cancelar una póliza
+  cancelPolicy: async (policyId) => {
+    try {
+      const response = await api.post(`/policies/${policyId}/cancel`)
+      return response.data
+    } catch (error) {
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al cancelar póliza" }
+    }
+  },
+
+  // Crear una reclamación para una póliza
+  createClaim: async (policyId, claimData) => {
+    try {
+      const response = await api.post(`/policies/${policyId}/claims`, claimData)
+      return response.data
+    } catch (error) {
+      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al crear reclamación" }
     }
   },
 }
