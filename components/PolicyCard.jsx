@@ -71,7 +71,7 @@ function PolicyCard({ policy }) {
       <div className="p-5">
         <div className="flex justify-between items-start mb-4">
           <div className="flex items-center">
-            <Shield className="h-6 w-6 text-[#B4C4AE] mr-2" />
+            <Shield className="h-6 w-6 text-blue-400 mr-2" />
             <h3 className="text-lg font-semibold text-gray-800">{policyTypeNames[policy.policy_type] || "Seguro"}</h3>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${status.color}`}>
@@ -106,7 +106,7 @@ function PolicyCard({ policy }) {
 
         <div className="pt-4 border-t border-gray-100 flex justify-between">
           <motion.button
-            className="text-[#B4C4AE] hover:text-[#a3b39d] text-sm font-medium"
+            className="text-blue-400 hover:text-blue-500 text-sm font-medium"
             whileHover={{ x: 3 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >

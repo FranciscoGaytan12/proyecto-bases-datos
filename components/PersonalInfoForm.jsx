@@ -73,8 +73,8 @@ function PersonalInfoForm({ user, onSubmit }) {
                 onChange={handleChange}
                 disabled={!isEditing || isLoading}
                 className={`block w-full pl-10 pr-3 py-2 border ${
-                  isEditing ? "border-[#B4C4AE]" : "border-gray-200 bg-gray-50"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  isEditing ? "border-blue-400" : "border-gray-200 bg-gray-50"
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
             </div>
           </div>
@@ -117,8 +117,8 @@ function PersonalInfoForm({ user, onSubmit }) {
                 onChange={handleChange}
                 disabled={!isEditing || isLoading}
                 className={`block w-full pl-10 pr-3 py-2 border ${
-                  isEditing ? "border-[#B4C4AE]" : "border-gray-200 bg-gray-50"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  isEditing ? "border-blue-400" : "border-gray-200 bg-gray-50"
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
             </div>
           </div>
@@ -140,8 +140,8 @@ function PersonalInfoForm({ user, onSubmit }) {
                 onChange={handleChange}
                 disabled={!isEditing || isLoading}
                 className={`block w-full pl-10 pr-3 py-2 border ${
-                  isEditing ? "border-[#B4C4AE]" : "border-gray-200 bg-gray-50"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  isEditing ? "border-blue-400" : "border-gray-200 bg-gray-50"
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
             </div>
           </div>
@@ -163,8 +163,8 @@ function PersonalInfoForm({ user, onSubmit }) {
                 onChange={handleChange}
                 disabled={!isEditing || isLoading}
                 className={`block w-full pl-10 pr-3 py-2 border ${
-                  isEditing ? "border-[#B4C4AE]" : "border-gray-200 bg-gray-50"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  isEditing ? "border-blue-400" : "border-gray-200 bg-gray-50"
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
             </div>
           </div>
@@ -187,7 +187,7 @@ function PersonalInfoForm({ user, onSubmit }) {
                 disabled={!isEditing || isLoading}
                 className={`block w-full pl-10 pr-3 py-2 border ${
                   isEditing ? "border-blue-400" : "border-gray-200 bg-gray-50"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
             </div>
           </div>
@@ -209,7 +209,7 @@ function PersonalInfoForm({ user, onSubmit }) {
               </motion.button>
               <motion.button
                 type="submit"
-                className={`px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-700 ${
+                className={`px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500 ${
                   isLoading ? "opacity-70 cursor-not-allowed" : ""
                 }`}
                 whileHover={{ scale: isLoading ? 1 : 1.02 }}
@@ -222,7 +222,7 @@ function PersonalInfoForm({ user, onSubmit }) {
           ) : (
             <motion.button
               type="button"
-              className="px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setIsEditing(true)}
