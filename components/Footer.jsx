@@ -21,7 +21,7 @@ function Footer() {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               <Shield className="h-8 w-8 text-blue-400" />
-              <span className="ml-2 text-xl font-bold">SeguroTotal</span>
+              <span className="ml-2 text-xl font-bold">B&S</span>
             </motion.div>
             <p className="text-gray-400 mb-4">
               Brindando protección y tranquilidad a familias y empresas desde hace más de 20 años.
@@ -29,7 +29,7 @@ function Footer() {
             <div className="flex space-x-4">
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className="text-gray-400 hover:text-blue-400 transition-colors"
                 whileHover={{ y: -5, color: "#F59E0B" }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -43,7 +43,7 @@ function Footer() {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className="text-gray-400 hover:text-blue-400 transition-colors"
                 whileHover={{ y: -5, color: "#F59E0B" }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -53,7 +53,7 @@ function Footer() {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className="text-gray-400 hover:text-blue-400 transition-colors"
                 whileHover={{ y: -5, color: "#F59E0B" }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -67,7 +67,7 @@ function Footer() {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 transition-colors"
+                className="text-gray-400 hover:text-blue-400 transition-colors"
                 whileHover={{ y: -5, color: "#F59E0B" }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -86,32 +86,32 @@ function Footer() {
             <h3 className="text-lg font-semibold mb-4">Seguros</h3>
             <ul className="space-y-2">
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Seguro de Vida
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Seguro de Salud
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Seguro de Auto
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Seguro de Hogar
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Seguro de Viaje
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Seguro para Empresas
                 </a>
               </motion.li>
@@ -122,32 +122,32 @@ function Footer() {
             <h3 className="text-lg font-semibold mb-4">Empresa</h3>
             <ul className="space-y-2">
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Sobre Nosotros
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Nuestro Equipo
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Carreras
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Noticias
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Blog
                 </a>
               </motion.li>
               <motion.li whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-                <a href="#" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
                   Responsabilidad Social
                 </a>
               </motion.li>
@@ -198,12 +198,12 @@ function Footer() {
               transition={{ delay: 0.2, duration: 0.5 }}
               viewport={{ once: true }}
             >
-              &copy; {new Date().getFullYear()} SeguroTotal. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} B&S. Todos los derechos reservados.
             </motion.p>
             <div className="flex space-x-6">
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 text-sm transition-colors"
+                className="text-gray-400 hover:text-blue-400 text-sm transition-colors"
                 whileHover={{ y: -2 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -211,7 +211,7 @@ function Footer() {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 text-sm transition-colors"
+                className="text-gray-400 hover:text-blue-400 text-sm transition-colors"
                 whileHover={{ y: -2 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
@@ -219,7 +219,7 @@ function Footer() {
               </motion.a>
               <motion.a
                 href="#"
-                className="text-gray-400 hover:text-amber-500 text-sm transition-colors"
+                className="text-gray-400 hover:text-blue-400 text-sm transition-colors"
                 whileHover={{ y: -2 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >

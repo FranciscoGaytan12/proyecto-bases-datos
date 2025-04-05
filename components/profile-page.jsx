@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { authService } from "../services/api"
 import UserProfile from "./UserProfile"
 
-function ProfilePage() {
+function ProfilePage({ onGoHome }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -41,8 +41,7 @@ function ProfilePage() {
     return null // No renderizar nada mientras se redirige
   }
 
-  return <UserProfile />
+  return <UserProfile onGoHome={onGoHome} />
 }
 
 export default ProfilePage
-

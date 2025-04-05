@@ -207,7 +207,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.name ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="Juan Pérez"
                   disabled={isLoading || success}
                 />
@@ -236,7 +236,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="tu@email.com"
                   disabled={isLoading || success}
                 />
@@ -265,7 +265,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="••••••••"
                   disabled={isLoading || success}
                 />
@@ -306,7 +306,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
                   type={showPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.confirmPassword ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.confirmPassword ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="••••••••"
                   disabled={isLoading || success}
                 />
@@ -325,7 +325,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
             <div className="pt-2">
               <motion.button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || success ? "bg-blue-400 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading || success ? "bg-blue-300 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-500"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400`}
                 whileHover={!isLoading && !success ? { scale: 1.02 } : {}}
                 whileTap={!isLoading && !success ? { scale: 0.98 } : {}}
                 disabled={isLoading || success}
@@ -348,7 +348,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
             <div className="mt-6">
               <motion.button
                 type="button"
-                className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-md shadow-sm text-sm font-medium text-black bg-white ] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#B4C4AE]"
+                className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-md shadow-sm text-sm font-medium text-blue-400 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {

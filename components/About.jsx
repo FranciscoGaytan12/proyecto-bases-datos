@@ -29,7 +29,7 @@ function About() {
   }
 
   return (
-    <section id="about" className="py-20 bg-amber-50" ref={aboutRef}>
+    <section id="about" className="py-20 bg-blue-50" ref={aboutRef}>
       <div className="container mx-auto px-4">
         <motion.div
           className="text-center mb-16"
@@ -111,7 +111,7 @@ function About() {
               </ul>
             </motion.div>
             <motion.button
-              className="flex items-center text-blue-400 font-medium transition-colors"
+              className="flex items-center text-blue-400 hover:text-blue-500 font-medium transition-colors"
               variants={fadeIn}
               whileHover={{ x: 5 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}

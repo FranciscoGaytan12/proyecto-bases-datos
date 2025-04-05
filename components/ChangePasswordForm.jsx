@@ -128,7 +128,7 @@ function ChangePasswordForm({ onSubmit }) {
                 disabled={isLoading}
                 className={`block w-full pl-10 pr-10 py-2 border ${
                   errors.currentPassword ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <motion.button
@@ -172,7 +172,7 @@ function ChangePasswordForm({ onSubmit }) {
                 disabled={isLoading}
                 className={`block w-full pl-10 pr-10 py-2 border ${
                   errors.newPassword ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <motion.button
@@ -216,7 +216,7 @@ function ChangePasswordForm({ onSubmit }) {
                 disabled={isLoading}
                 className={`block w-full pl-10 pr-10 py-2 border ${
                   errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                } rounded-md shadow-sm focus:ring-[#B4C4AE] focus:border-[#B4C4AE]`}
+                } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                 <motion.button
@@ -247,7 +247,7 @@ function ChangePasswordForm({ onSubmit }) {
         <div className="flex justify-end mt-6">
           <motion.button
             type="submit"
-            className={`px-4 py-2 bg-blue-400 text-white rounded-md  ${
+            className={`px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500 ${
               isLoading ? "opacity-70 cursor-not-allowed" : ""
             }`}
             whileHover={{ scale: isLoading ? 1 : 1.02 }}

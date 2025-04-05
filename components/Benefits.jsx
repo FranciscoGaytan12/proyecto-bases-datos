@@ -64,7 +64,7 @@ function Benefits() {
           variants={staggerContainer}
         >
           {/* Benefit Card 1 */}
-          <motion.div className="bg-amber-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
+          <motion.div className="bg-blue-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -80,7 +80,7 @@ function Benefits() {
           </motion.div>
 
           {/* Benefit Card 2 */}
-          <motion.div className="bg-amber-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
+          <motion.div className="bg-blue-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -96,7 +96,7 @@ function Benefits() {
           </motion.div>
 
           {/* Benefit Card 3 */}
-          <motion.div className="bg-amber-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
+          <motion.div className="bg-blue-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -111,7 +111,7 @@ function Benefits() {
           </motion.div>
 
           {/* Benefit Card 4 */}
-          <motion.div className="bg-amber-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
+          <motion.div className="bg-blue-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -126,7 +126,7 @@ function Benefits() {
           </motion.div>
 
           {/* Benefit Card 5 */}
-          <motion.div className="bg-amber-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
+          <motion.div className="bg-blue-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -142,7 +142,7 @@ function Benefits() {
           </motion.div>
 
           {/* Benefit Card 6 */}
-          <motion.div className="bg-amber-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
+          <motion.div className="bg-blue-50 rounded-lg p-8 shadow-sm" variants={cardVariants} whileHover="hover">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

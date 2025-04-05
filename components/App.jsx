@@ -14,6 +14,7 @@ import Register from "../Register"
 import { authService } from "../services/api"
 // Importar el componente ProfilePage
 import ProfilePage from "./profile-page"
+import Dashboard from "./Dashboard"
 
 function App() {
   const { scrollYProgress } = useScroll()
@@ -21,8 +22,9 @@ function App() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
-  // Añadir una nueva variable de estado para controlar la visualización del perfil
+  // Variables de estado para controlar la visualización
   const [showProfile, setShowProfile] = useState(false)
+  const [showDashboard, setShowDashboard] = useState(false)
 
   // Verificar si el usuario está autenticado al cargar la página
   useEffect(() => {
@@ -48,38 +50,55 @@ function App() {
     setIsRegisterOpen(true)
   }
 
-  // Añadir una función para manejar la navegación al perfil
+  // Función para manejar la navegación al perfil
   const handleProfileClick = () => {
     setShowProfile(true)
+    setShowDashboard(false)
     setIsLoginOpen(false)
     setIsRegisterOpen(false)
+  }
+
+  // Función para manejar la navegación al dashboard
+  const handleDashboardClick = () => {
+    setShowDashboard(true)
+    setShowProfile(false)
+    setIsLoginOpen(false)
+    setIsRegisterOpen(false)
+  }
+
+  // Función para manejar el regreso a la página principal
+  const handleGoHome = () => {
+    setShowProfile(false)
+    setShowDashboard(false)
   }
 
   const handleLogout = () => {
     authService.logout()
     setIsAuthenticated(false)
     setUser(null)
-    window.location.reload()
+    setShowProfile(false)
+    setShowDashboard(false)
   }
 
-  // Modificar el return para incluir la página de perfil
-  // Reemplazar el return actual con:
   return (
     <div className="min-h-screen bg-amber-50">
       {/* Barra de progreso */}
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-blue-500   z-50" style={{ scaleX: scrollYProgress }} />
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 z-50" style={{ scaleX: scrollYProgress }} />
 
       <Header
         onLoginClick={handleLoginClick}
         onRegisterClick={handleRegisterClick}
         onProfileClick={handleProfileClick}
+        onDashboardClick={handleDashboardClick}
         onLogout={handleLogout}
         isAuthenticated={isAuthenticated}
         user={user}
       />
 
       {showProfile ? (
-        <ProfilePage />
+        <ProfilePage onGoHome={handleGoHome} />
+      ) : showDashboard ? (
+        <Dashboard onGoHome={handleGoHome} />
       ) : (
         <main>
           <Hero />
@@ -102,4 +121,3 @@ function App() {
 }
 
 export default App
-

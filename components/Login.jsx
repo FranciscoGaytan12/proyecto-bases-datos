@@ -57,7 +57,35 @@ function Login({ isOpen, onClose }) {
         window.location.reload()
       } catch (error) {
         console.error("Error al iniciar sesión:", error)
-        setApiError(error.message || "Error al iniciar sesión. Inténtalo de nuevo.")
+
+        // Mostrar mensaje de error detallado
+        let errorMessage = "Error al iniciar sesión. Inténtalo de nuevo."
+
+        if (error.message) {
+          errorMessage = error.message
+        } else if (typeof error === "string") {
+          errorMessage = error
+        } else if (error.code) {
+          // Mensajes específicos según el código de error
+          switch (error.code) {
+            case "ECONNABORTED":
+              errorMessage = "La conexión ha expirado. Verifica que el servidor esté respondiendo."
+              break
+            case "NETWORK_ERROR":
+              errorMessage = "Error de red. Verifica tu conexión a internet."
+              break
+            case "NO_RESPONSE":
+              errorMessage = "No se recibió respuesta del servidor. Verifica que el backend esté en ejecución."
+              break
+            case "INVALID_URL":
+              errorMessage = "La URL de la API es inválida. Contacta al administrador."
+              break
+            default:
+              errorMessage = `Error: ${error.code || "desconocido"}`
+          }
+        }
+
+        setApiError(errorMessage)
       } finally {
         setIsLoading(false)
       }
@@ -155,7 +183,7 @@ function Login({ isOpen, onClose }) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="tu@email.com"
                   disabled={isLoading}
                 />
@@ -184,7 +212,7 @@ function Login({ isOpen, onClose }) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500`}
+                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="••••••••"
                   disabled={isLoading}
                 />
@@ -219,7 +247,7 @@ function Login({ isOpen, onClose }) {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text- focus:ring-amber-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
                   disabled={isLoading}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -229,7 +257,7 @@ function Login({ isOpen, onClose }) {
 
               <motion.a
                 href="#"
-                className="text-sm font-medium text-black hover:text-amber-500"
+                className="text-sm font-medium text-blue-400 hover:text-[#a3b39d]"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -240,7 +268,7 @@ function Login({ isOpen, onClose }) {
             <div>
               <motion.button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-700"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-500"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400`}
                 whileHover={!isLoading ? { scale: 1.02 } : {}}
                 whileTap={!isLoading ? { scale: 0.98 } : {}}
                 disabled={isLoading}
@@ -263,7 +291,7 @@ function Login({ isOpen, onClose }) {
             <div className="mt-6">
               <motion.button
                 type="button"
-                className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-md shadow-sm text-sm font-medium text-black  bg-white hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+                className="w-full flex justify-center py-2 px-4 border border-blue-400 rounded-md shadow-sm text-sm font-medium text-blue-400 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={isLoading}

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
-// Imágenes para el carrusel - 
+// Imágenes para el carrusel - reemplaza estas URLs con tus propias imágenes
 const carouselImages = [
   {
     url: "https://images.unsplash.com/photo-1560520031-3a4dc4e9de0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80",
@@ -142,7 +142,7 @@ function Hero() {
             transition={{ delay: 0.6, duration: 0.8 }}
           >
             <motion.button
-              className="bg-blue-400 text-white px-6 py-3 rounded-md font-medium transition-colors"
+              className="bg-blue-400 hover:bg-blue-500 text-white px-6 py-3 rounded-md font-medium transition-colors"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
               whileTap={{ scale: 0.95 }}
             >
