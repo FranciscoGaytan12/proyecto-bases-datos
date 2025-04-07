@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle } from "lucide-react"
 import { authService } from "./services/api"
@@ -15,6 +15,16 @@ function Register({ isOpen, onClose, onLoginClick }) {
   const [isLoading, setIsLoading] = useState(false)
   const [apiError, setApiError] = useState("")
   const [success, setSuccess] = useState(false)
+  const [registerAttempts, setRegisterAttempts] = useState(0)
+
+  // Limpiar errores cuando se abre el modal
+  useEffect(() => {
+    if (isOpen) {
+      setApiError("")
+      setErrors({})
+      setSuccess(false)
+    }
+  }, [isOpen])
 
   const validateForm = () => {
     const newErrors = {}
@@ -54,6 +64,9 @@ function Register({ isOpen, onClose, onLoginClick }) {
       setIsLoading(true)
 
       try {
+        // Incrementar contador de intentos
+        setRegisterAttempts((prev) => prev + 1)
+
         // Llamar al servicio de registro
         const response = await authService.register({
           name,
@@ -80,24 +93,43 @@ function Register({ isOpen, onClose, onLoginClick }) {
       } catch (error) {
         console.error("Error al registrar:", error)
 
-        // Mostrar detalles completos del error
-        if (error.response) {
-          // El servidor respondió con un código de estado fuera del rango 2xx
-          console.error("Datos del error:", error.response.data)
-          console.error("Estado HTTP:", error.response.status)
-          console.error("Cabeceras:", error.response.headers)
-          setApiError(
-            error.response.data.message || error.response.data.error || "Error al registrar. Inténtalo de nuevo.",
-          )
-        } else if (error.request) {
-          // La petición fue hecha pero no se recibió respuesta
-          console.error("No se recibió respuesta del servidor:", error.request)
-          setApiError("No se pudo conectar con el servidor. Verifica tu conexión a internet.")
-        } else {
-          // Algo ocurrió al configurar la petición
-          console.error("Error de configuración:", error.message)
-          setApiError("Error al procesar la solicitud: " + error.message)
+        // Mostrar mensaje de error detallado
+        let errorMessage = "Error al registrar usuario. Inténtalo de nuevo."
+
+        if (error && typeof error === "object") {
+          if (error.message) {
+            errorMessage = error.message
+          } else if (error.status === 409) {
+            errorMessage = "Este correo electrónico ya está registrado. Por favor, utiliza otro o inicia sesión."
+          } else if (error.code) {
+            // Mensajes específicos según el código de error
+            switch (error.code) {
+              case "ECONNABORTED":
+                errorMessage = "La conexión con el servidor ha expirado. Verifica que el servidor esté respondiendo."
+                break
+              case "NETWORK_ERROR":
+                errorMessage = "Error de red. Verifica tu conexión a internet."
+                break
+              case "NO_RESPONSE":
+                errorMessage = "No se recibió respuesta del servidor. Verifica que el backend esté en ejecución."
+                break
+              case "INVALID_URL":
+                errorMessage = "La URL de la API es inválida. Contacta al administrador."
+                break
+              default:
+                errorMessage = `Error: ${error.code || "desconocido"}`
+            }
+          }
+        } else if (typeof error === "string") {
+          errorMessage = error
         }
+
+        // Si hay muchos intentos fallidos, sugerir verificar la URL de la API
+        if (registerAttempts >= 3) {
+          errorMessage += " Verifica que la URL de la API sea correcta en las variables de entorno."
+        }
+
+        setApiError(errorMessage)
       } finally {
         setIsLoading(false)
       }

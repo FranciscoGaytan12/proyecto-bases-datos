@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { X, Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react"
+import { X, Mail, Lock, Eye, EyeOff, AlertCircle, AlertTriangle } from "lucide-react"
 import { authService } from "../services/api"
 
-function Login({ isOpen, onClose }) {
+function Login({ isOpen, onClose, onRegisterClick }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -13,6 +13,17 @@ function Login({ isOpen, onClose }) {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [apiError, setApiError] = useState("")
+  const [apiErrorType, setApiErrorType] = useState("") // Para controlar el tipo de error
+  const [loginAttempts, setLoginAttempts] = useState(0)
+
+  // Limpiar errores cuando se abre el modal
+  useEffect(() => {
+    if (isOpen) {
+      setApiError("")
+      setApiErrorType("")
+      setErrors({})
+    }
+  }, [isOpen])
 
   const validateForm = () => {
     const newErrors = {}
@@ -38,11 +49,18 @@ function Login({ isOpen, onClose }) {
 
     // Limpiar errores previos
     setApiError("")
+    setApiErrorType("")
 
     if (validateForm()) {
       setIsLoading(true)
 
       try {
+        // Incrementar contador de intentos
+        setLoginAttempts((prev) => prev + 1)
+
+        // Limpiar cualquier token anterior
+        authService.logout()
+
         // Llamar al servicio de autenticación
         const response = await authService.login(email, password)
 
@@ -54,38 +72,70 @@ function Login({ isOpen, onClose }) {
         onClose()
 
         // Recargar la página o redirigir al usuario
-        window.location.reload()
+        // Usamos setTimeout para evitar problemas con la actualización del estado
+        setTimeout(() => {
+          window.location.href = "/"
+        }, 500)
       } catch (error) {
         console.error("Error al iniciar sesión:", error)
 
         // Mostrar mensaje de error detallado
         let errorMessage = "Error al iniciar sesión. Inténtalo de nuevo."
+        let errorType = "general"
 
-        if (error.message) {
-          errorMessage = error.message
+        if (error && typeof error === "object") {
+          if (error.message) {
+            errorMessage = error.message
+          }
+
+          // Determinar el tipo de error
+          if (error.status === 404 || error.isNotFoundError) {
+            errorType = "notFound"
+            errorMessage = "El servicio de inicio de sesión no está disponible. Verifica la configuración del servidor."
+          } else if (error.status === 401 || error.isAuthError) {
+            errorType = "auth"
+            errorMessage = "Credenciales incorrectas. Por favor, verifica tu email y contraseña."
+          } else if (error.code) {
+            // Mensajes específicos según el código de error
+            switch (error.code) {
+              case "ECONNABORTED":
+                errorType = "connection"
+                errorMessage = "La conexión con el servidor ha expirado. Verifica que el servidor esté respondiendo."
+                break
+              case "NETWORK_ERROR":
+                errorType = "connection"
+                errorMessage = "Error de red. Verifica tu conexión a internet."
+                break
+              case "NO_RESPONSE":
+                errorType = "connection"
+                errorMessage = "No se recibió respuesta del servidor. Verifica que el backend esté en ejecución."
+                break
+              case "INVALID_URL":
+                errorType = "config"
+                errorMessage = "La URL de la API es inválida. Contacta al administrador."
+                break
+              case "API_STRUCTURE_ERROR":
+                errorType = "config"
+                errorMessage = "La estructura de la API es incorrecta. Verifica la configuración del servidor."
+                break
+              default:
+                errorType = "general"
+                errorMessage = `Error: ${error.code || "desconocido"}`
+            }
+          }
         } else if (typeof error === "string") {
           errorMessage = error
-        } else if (error.code) {
-          // Mensajes específicos según el código de error
-          switch (error.code) {
-            case "ECONNABORTED":
-              errorMessage = "La conexión ha expirado. Verifica que el servidor esté respondiendo."
-              break
-            case "NETWORK_ERROR":
-              errorMessage = "Error de red. Verifica tu conexión a internet."
-              break
-            case "NO_RESPONSE":
-              errorMessage = "No se recibió respuesta del servidor. Verifica que el backend esté en ejecución."
-              break
-            case "INVALID_URL":
-              errorMessage = "La URL de la API es inválida. Contacta al administrador."
-              break
-            default:
-              errorMessage = `Error: ${error.code || "desconocido"}`
+        }
+
+        // Si hay muchos intentos fallidos, sugerir verificar la URL de la API
+        if (loginAttempts >= 3) {
+          if (errorType === "notFound" || errorType === "connection" || errorType === "config") {
+            errorMessage += " Parece que hay un problema con la configuración del servidor. Contacta al administrador."
           }
         }
 
         setApiError(errorMessage)
+        setApiErrorType(errorType)
       } finally {
         setIsLoading(false)
       }
@@ -125,6 +175,32 @@ function Login({ isOpen, onClose }) {
     },
   }
 
+  // Función para renderizar el icono de error según el tipo
+  const renderErrorIcon = () => {
+    switch (apiErrorType) {
+      case "notFound":
+      case "connection":
+      case "config":
+        return <AlertTriangle className="h-5 w-5 text-amber-500 mt-0.5 mr-2 flex-shrink-0" />
+      case "auth":
+      default:
+        return <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
+    }
+  }
+
+  // Función para obtener la clase de color según el tipo de error
+  const getErrorClass = () => {
+    switch (apiErrorType) {
+      case "notFound":
+      case "connection":
+      case "config":
+        return "bg-amber-50 border-amber-200 text-amber-700"
+      case "auth":
+      default:
+        return "bg-red-50 border-red-200 text-red-600"
+    }
+  }
+
   if (!isOpen) return null
 
   return (
@@ -160,12 +236,12 @@ function Login({ isOpen, onClose }) {
 
           {apiError && (
             <motion.div
-              className="mb-6 p-3 bg-red-50 border border-red-200 rounded-md flex items-start"
+              className={`mb-6 p-3 border rounded-md flex items-start ${getErrorClass()}`}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2 flex-shrink-0" />
-              <p className="text-sm text-red-600">{apiError}</p>
+              {renderErrorIcon()}
+              <p className="text-sm">{apiError}</p>
             </motion.div>
           )}
 
@@ -183,7 +259,9 @@ function Login({ isOpen, onClose }) {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
+                  className={`block w-full pl-10 pr-3 py-2 border ${
+                    errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="tu@email.com"
                   disabled={isLoading}
                 />
@@ -212,7 +290,9 @@ function Login({ isOpen, onClose }) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-gray-300"} rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
+                  className={`block w-full pl-10 pr-10 py-2 border ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm focus:ring-blue-400 focus:border-blue-400`}
                   placeholder="••••••••"
                   disabled={isLoading}
                 />
@@ -247,7 +327,7 @@ function Login({ isOpen, onClose }) {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-400 focus:ring-blue-400 border-gray-300 rounded"
                   disabled={isLoading}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -257,7 +337,7 @@ function Login({ isOpen, onClose }) {
 
               <motion.a
                 href="#"
-                className="text-sm font-medium text-blue-400 hover:text-[#a3b39d]"
+                className="text-sm font-medium text-blue-400 hover:text-blue-500"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -268,7 +348,9 @@ function Login({ isOpen, onClose }) {
             <div>
               <motion.button
                 type="submit"
-                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${isLoading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-500"} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400`}
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                  isLoading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-500"
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400`}
                 whileHover={!isLoading ? { scale: 1.02 } : {}}
                 whileTap={!isLoading ? { scale: 0.98 } : {}}
                 disabled={isLoading}
@@ -295,6 +377,10 @@ function Login({ isOpen, onClose }) {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={isLoading}
+                onClick={() => {
+                  onClose()
+                  if (onRegisterClick) onRegisterClick()
+                }}
               >
                 Crear una cuenta
               </motion.button>
