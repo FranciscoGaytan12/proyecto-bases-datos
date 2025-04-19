@@ -117,11 +117,51 @@ function UserProfile() {
     window.location.href = "/"
   }
 
+  // Función para reintentar la carga de datos
+  const handleRetry = () => {
+    setError(null)
+    setLoading(true)
+    const fetchUserData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Obtener usuario del localStorage
+        const currentUser = authService.getCurrentUser()
+
+        if (!currentUser) {
+          throw new Error("No se encontró información del usuario")
+        }
+
+        // Usar el usuario del localStorage mientras se carga el perfil
+        setUser(currentUser)
+
+        try {
+          // Obtener perfil actualizado desde el servidor
+          const profileData = await authService.getProfile()
+          setUser(profileData.user)
+        } catch (profileError) {
+          console.error("Error al cargar perfil desde el servidor:", profileError)
+          // No establecer error aquí, ya que tenemos el usuario del localStorage
+        }
+
+        // Cargar pólizas del usuario
+        await fetchUserPolicies()
+      } catch (err) {
+        console.error("Error al cargar datos del usuario:", err)
+        setError(err.message || "Error al cargar datos del usuario")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUserData()
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-amber-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B4C4AE] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
           <p className="mt-4 text-gray-600">Cargando perfil...</p>
         </div>
       </div>
@@ -137,12 +177,20 @@ function UserProfile() {
             <h2 className="text-xl font-semibold">Error</h2>
           </div>
           <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="w-full bg-[#B4C4AE] hover:bg-[#a3b39d] text-white py-2 rounded-md transition-colors"
-          >
-            Reintentar
-          </button>
+          <div className="flex flex-col space-y-3">
+            <button
+              onClick={handleRetry}
+              className="w-full bg-blue-400 hover:bg-blue-500 text-white py-2 rounded-md transition-colors"
+            >
+              Reintentar
+            </button>
+            <button
+              onClick={handleGoHome}
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-md transition-colors"
+            >
+              Volver al inicio
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -161,7 +209,7 @@ function UserProfile() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">{user?.name || "Usuario"}</h1>
-                  <p className="text-amber-50">{user?.email}</p>
+                  <p className="text-white opacity-90">{user?.email}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -220,7 +268,7 @@ function UserProfile() {
 
                   {loadingPolicies ? (
                     <div className="text-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B4C4AE] mx-auto"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
                       <p className="mt-4 text-gray-600">Cargando pólizas...</p>
                     </div>
                   ) : policies.length > 0 ? (

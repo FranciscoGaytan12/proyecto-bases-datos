@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { Car, Home, Heart, Briefcase, Plane, Activity } from "lucide-react"
 
-// Definición de las pólizas disponibles
+
 const availablePolicyTypes = [
   {
     id: "auto",
@@ -79,7 +79,7 @@ function AvailablePolicies({ onSelectPolicy }) {
               <div>
                 <span className="text-sm text-gray-500">Desde</span>
                 <p className="text-xl font-bold text-gray-800">
-                  {policy.startingPrice}€<span className="text-sm font-normal text-gray-500">/mes</span>
+                  {policy.startingPrice}$<span className="text-sm font-normal text-gray-500">/mes</span>
                 </p>
               </div>
               <motion.button
