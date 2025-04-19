@@ -2,6 +2,8 @@
 
 import { motion } from "framer-motion"
 import { Shield, AlertTriangle, CheckCircle, Clock } from "lucide-react"
+import { useState } from "react"
+import PolicyDetails from "./PolicyDetails"
 
 // Función para formatear fechas
 const formatDate = (dateString) => {
@@ -17,9 +19,9 @@ const formatDate = (dateString) => {
 // Función para formatear moneda
 const formatCurrency = (amount) => {
   if (!amount && amount !== 0) return "N/A"
-  return new Intl.NumberFormat("es-ES", {
+  return new Intl.NumberFormat("es-MX", {
     style: "currency",
-    currency: "EUR",
+    currency: "MXN",
     minimumFractionDigits: 2,
   }).format(amount)
 }
@@ -58,75 +60,101 @@ const statusConfig = {
   },
 }
 
-function PolicyCard({ policy }) {
+function PolicyCard({ policy, onPolicyUpdate }) {
+  const [showDetails, setShowDetails] = useState(false)
   const status = statusConfig[policy.status] || statusConfig.pending
   const StatusIcon = status.icon
 
+  const handlePolicyCancelled = (policyId) => {
+    // Actualizar el estado de la póliza localmente
+    const updatedPolicy = { ...policy, status: "cancelled" }
+
+    // Notificar al componente padre
+    if (onPolicyUpdate) {
+      onPolicyUpdate(updatedPolicy)
+    }
+
+    // Cerrar el modal de detalles
+    setShowDetails(false)
+  }
+
   return (
-    <motion.div
-      className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
-      whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className="p-5">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center">
-            <Shield className="h-6 w-6 text-blue-400 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-800">{policyTypeNames[policy.policy_type] || "Seguro"}</h3>
-          </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${status.color}`}>
-            <StatusIcon className="h-3 w-3 mr-1" />
-            {status.label}
-          </div>
-        </div>
-
-        <div className="space-y-3 mb-4">
-          <div className="flex justify-between">
-            <span className="text-gray-500 text-sm">Número de póliza:</span>
-            <span className="text-gray-800 text-sm font-medium">{policy.policy_number}</span>
+    <>
+      <motion.div
+        className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
+        whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
+        transition={{ duration: 0.2 }}
+      >
+        <div className="p-5">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center">
+              <Shield className="h-6 w-6 text-blue-400 mr-2" />
+              <h3 className="text-lg font-semibold text-gray-800">{policyTypeNames[policy.policy_type] || "Seguro"}</h3>
+            </div>
+            <div className={`px-3 py-1 rounded-full text-xs font-medium flex items-center ${status.color}`}>
+              <StatusIcon className="h-3 w-3 mr-1" />
+              {status.label}
+            </div>
           </div>
 
-          <div className="flex justify-between">
-            <span className="text-gray-500 text-sm">Vigencia:</span>
-            <span className="text-gray-800 text-sm font-medium">
-              {formatDate(policy.start_date)} - {formatDate(policy.end_date)}
-            </span>
+          <div className="space-y-3 mb-4">
+            <div className="flex justify-between">
+              <span className="text-gray-500 text-sm">Número de póliza:</span>
+              <span className="text-gray-800 text-sm font-medium">{policy.policy_number}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-gray-500 text-sm">Vigencia:</span>
+              <span className="text-gray-800 text-sm font-medium">
+                {formatDate(policy.start_date)} - {formatDate(policy.end_date)}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-gray-500 text-sm">Prima:</span>
+              <span className="text-gray-800 text-sm font-medium">{formatCurrency(policy.premium)}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-gray-500 text-sm">Cobertura:</span>
+              <span className="text-gray-800 text-sm font-medium">{formatCurrency(policy.coverage_amount)}</span>
+            </div>
           </div>
 
-          <div className="flex justify-between">
-            <span className="text-gray-500 text-sm">Prima:</span>
-            <span className="text-gray-800 text-sm font-medium">{formatCurrency(policy.premium)}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-gray-500 text-sm">Cobertura:</span>
-            <span className="text-gray-800 text-sm font-medium">{formatCurrency(policy.coverage_amount)}</span>
-          </div>
-        </div>
-
-        <div className="pt-4 border-t border-gray-100 flex justify-between">
-          <motion.button
-            className="text-blue-400 hover:text-blue-500 text-sm font-medium"
-            whileHover={{ x: 3 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            Ver detalles
-          </motion.button>
-
-          {policy.status === "active" && (
+          <div className="pt-4 border-t border-gray-100 flex justify-between">
             <motion.button
-              className="text-red-500 hover:text-red-600 text-sm font-medium"
+              className="text-blue-400 hover:text-blue-500 text-sm font-medium"
               whileHover={{ x: 3 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              onClick={() => setShowDetails(true)}
             >
-              Reportar siniestro
+              Ver detalles
             </motion.button>
-          )}
+
+            {policy.status === "active" && (
+              <motion.button
+                className="text-red-500 hover:text-red-600 text-sm font-medium"
+                whileHover={{ x: 3 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                onClick={() => setShowDetails(true)}
+              >
+                Reportar siniestro
+              </motion.button>
+            )}
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Modal de detalles de la póliza */}
+      {showDetails && (
+        <PolicyDetails
+          policyId={policy.id}
+          onClose={() => setShowDetails(false)}
+          onPolicyCancelled={handlePolicyCancelled}
+        />
+      )}
+    </>
   )
 }
 
 export default PolicyCard
-

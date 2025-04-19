@@ -291,7 +291,7 @@ function PolicyForm({ policyType, onSubmit, onCancel }) {
           {/* Prima y cobertura */}
           <div>
             <label htmlFor="premium" className="block text-sm font-medium text-gray-700 mb-1">
-              Prima mensual (€)
+              Prima mensual ($)
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -316,7 +316,7 @@ function PolicyForm({ policyType, onSubmit, onCancel }) {
 
           <div>
             <label htmlFor="coverage_amount" className="block text-sm font-medium text-gray-700 mb-1">
-              Monto de cobertura (€)
+              Monto de cobertura ($)
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

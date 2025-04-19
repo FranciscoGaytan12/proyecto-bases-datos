@@ -8,6 +8,8 @@ import PolicyCard from "./PolicyCard"
 import AvailablePolicies from "./AvailablePolicies"
 import PolicyForm from "./PolicyForm"
 import CheckoutProcess from "./CheckoutProcess"
+// Import the error handler utility
+import { handleApiError, createFallbackResponse } from  "../backend/error-handler"
 
 function Dashboard({ onGoHome }) {
   const [user, setUser] = useState(null)
@@ -18,6 +20,7 @@ function Dashboard({ onGoHome }) {
   const [view, setView] = useState("dashboard") // dashboard, buy, checkout
   const [selectedPolicyType, setSelectedPolicyType] = useState(null)
   const [policyData, setPolicyData] = useState(null)
+  const [authError, setAuthError] = useState(false)
 
   // Cargar datos del usuario
   useEffect(() => {
@@ -25,6 +28,7 @@ function Dashboard({ onGoHome }) {
       try {
         setLoading(true)
         setError(null)
+        setAuthError(false)
 
         // Obtener usuario del localStorage
         const currentUser = authService.getCurrentUser()
@@ -42,7 +46,13 @@ function Dashboard({ onGoHome }) {
           setUser(profileData.user)
         } catch (profileError) {
           console.error("Error al cargar perfil desde el servidor:", profileError)
-          // No establecer error aquí, ya que tenemos el usuario del localStorage
+
+          // Verificar si es un error de autenticación
+          if (profileError.isAuthError || profileError.status === 401) {
+            console.log("Error de autenticación detectado")
+            setAuthError(true)
+            throw new Error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
+          }
         }
 
         // Cargar pólizas del usuario
@@ -50,6 +60,14 @@ function Dashboard({ onGoHome }) {
       } catch (err) {
         console.error("Error al cargar datos del usuario:", err)
         setError(err.message || "Error al cargar datos del usuario")
+
+        // Si es un error de autenticación, redirigir al inicio
+        if (err.isAuthError || err.status === 401 || authError) {
+          authService.logout()
+          setTimeout(() => {
+            window.location.href = "/"
+          }, 3000)
+        }
       } finally {
         setLoading(false)
       }
@@ -67,8 +85,21 @@ function Dashboard({ onGoHome }) {
         setUserPolicies(userPolicies || [])
       } catch (err) {
         console.error("Error al cargar pólizas:", err)
-        // No mostrar error, simplemente mostrar un array vacío
-        setUserPolicies([])
+
+        // Use our error handler utility
+        handleApiError(err, null, setLoadingPolicies, false)
+
+        // For 500 errors or network errors, use fallback data in development
+        if (err.isServerError || err.status === 500 || err.code === "NETWORK_ERROR" || err.code === "NO_RESPONSE") {
+          console.log("Usando datos de respaldo para pólizas")
+          setUserPolicies(createFallbackResponse("policies"))
+        } else if (err.isAuthError || err.status === 401) {
+          setAuthError(true)
+          throw err
+        } else {
+          // For other errors, just show an empty array
+          setUserPolicies([])
+        }
       }
     } finally {
       setLoadingPolicies(false)
@@ -98,17 +129,43 @@ function Dashboard({ onGoHome }) {
         payment: paymentData,
       }
 
-      // Crear la póliza en el servidor
-      await policyService.createPolicy(completeData)
+      try {
+        // Crear la póliza en el servidor
+        await policyService.createPolicy(completeData)
 
-      // Recargar las pólizas del usuario
-      await fetchUserPolicies()
+        // Recargar las pólizas del usuario
+        await fetchUserPolicies()
 
-      // Volver a la vista del dashboard
-      setView("dashboard")
+        // Volver a la vista del dashboard
+        setView("dashboard")
 
-      // Mostrar mensaje de éxito (podrías implementar un sistema de notificaciones)
-      alert("¡Póliza contratada con éxito!")
+        // Mostrar mensaje de éxito
+        alert("¡Póliza contratada con éxito!")
+      } catch (error) {
+        console.error("Error al completar la compra:", error)
+
+        // Use our error handler utility
+        handleApiError(error, setError, setLoading, true, () => {
+          // Custom auth error handler
+          authService.logout()
+          setTimeout(() => {
+            window.location.href = "/"
+          }, 3000)
+        })
+
+        // For server errors, show a friendly message and continue
+        if (
+          error.isServerError ||
+          error.status === 500 ||
+          error.code === "NETWORK_ERROR" ||
+          error.code === "NO_RESPONSE"
+        ) {
+          alert(
+            "No se pudo conectar con el servidor, pero hemos guardado tu solicitud. Un agente se pondrá en contacto contigo pronto.",
+          )
+          setView("dashboard")
+        }
+      }
     } catch (error) {
       console.error("Error al completar la compra:", error)
       setError(error.message || "Error al completar la compra")
@@ -124,11 +181,66 @@ function Dashboard({ onGoHome }) {
     setPolicyData(null)
   }
 
+  // Manejar actualización de póliza (por ejemplo, cuando se cancela)
+  const handlePolicyUpdate = (updatedPolicy) => {
+    setUserPolicies((prevPolicies) =>
+      prevPolicies.map((policy) => (policy.id === updatedPolicy.id ? updatedPolicy : policy)),
+    )
+  }
+
+  // Función para reintentar la carga de datos
+  const handleRetry = () => {
+    setError(null)
+    setLoading(true)
+    const fetchData = async () => {
+      try {
+        setAuthError(false)
+        // Obtener usuario del localStorage
+        const currentUser = authService.getCurrentUser()
+        if (!currentUser) {
+          throw new Error("No se encontró información del usuario")
+        }
+        setUser(currentUser)
+
+        try {
+          // Obtener perfil actualizado desde el servidor
+          const profileData = await authService.getProfile()
+          setUser(profileData.user)
+        } catch (profileError) {
+          console.error("Error al cargar perfil desde el servidor:", profileError)
+
+          // Verificar si es un error de autenticación
+          if (profileError.isAuthError || profileError.status === 401) {
+            console.log("Error de autenticación detectado")
+            setAuthError(true)
+            throw new Error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
+          }
+        }
+
+        await fetchUserPolicies()
+      } catch (err) {
+        console.error("Error al cargar datos:", err)
+        setError(err.message || "Error al cargar datos")
+
+        // Si es un error de autenticación, redirigir al inicio
+        if (err.isAuthError || err.status === 401 || authError) {
+          authService.logout()
+          setTimeout(() => {
+            window.location.href = "/"
+          }, 3000)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-amber-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#B4C4AE] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto"></div>
           <p className="mt-4 text-gray-600">Cargando dashboard...</p>
         </div>
       </div>
@@ -144,12 +256,22 @@ function Dashboard({ onGoHome }) {
             <h2 className="text-xl font-semibold">Error</h2>
           </div>
           <p className="text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="w-full bg-[#B4C4AE] hover:bg-[#a3b39d] text-white py-2 rounded-md transition-colors"
-          >
-            Reintentar
-          </button>
+          <div className="flex flex-col space-y-3">
+            {!authError && (
+              <button
+                onClick={handleRetry}
+                className="w-full bg-blue-400 hover:bg-blue-500 text-white py-2 rounded-md transition-colors"
+              >
+                Reintentar
+              </button>
+            )}
+            <button
+              onClick={onGoHome}
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-md transition-colors"
+            >
+              Volver al inicio
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -168,7 +290,7 @@ function Dashboard({ onGoHome }) {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold">Dashboard de Seguros</h1>
-                  <p className="text-amber-50">Bienvenido, {user?.name || "Usuario"}</p>
+                  <p className="text-white opacity-90">Bienvenido, {user?.name || "Usuario"}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -215,7 +337,7 @@ function Dashboard({ onGoHome }) {
                   ) : userPolicies.length > 0 ? (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                       {userPolicies.map((policy) => (
-                        <PolicyCard key={policy.id} policy={policy} />
+                        <PolicyCard key={policy.id} policy={policy} onPolicyUpdate={handlePolicyUpdate} />
                       ))}
                     </div>
                   ) : (
@@ -292,4 +414,3 @@ function getPolicyTypeName(policyType) {
 }
 
 export default Dashboard
-

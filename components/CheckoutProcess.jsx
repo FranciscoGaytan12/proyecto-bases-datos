@@ -152,9 +152,9 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
 
   // Formatear moneda
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("es-ES", {
+    return new Intl.NumberFormat("es-MX", {
       style: "currency",
-      currency: "EUR",
+      currency: "MXN",
       minimumFractionDigits: 2,
     }).format(amount)
   }
@@ -567,4 +567,3 @@ function getBeneficiaryRelationship(relationship) {
 }
 
 export default CheckoutProcess
-

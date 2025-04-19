@@ -35,7 +35,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onDashboardClic
         </motion.button>
 
         {/* Desktop navigation */}
-        <nav className="hidden md:flex items-center space-x-4">
+        <nav className="hidden md:flex items-center space-x-4 ">
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
             <a href="#" className="text-gray-700 hover:text-blue-400 transition-colors">
               Inicio
