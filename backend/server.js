@@ -171,7 +171,7 @@ function isAdmin(req, res, next) {
 // Ruta protegida para obtener perfil de usuario
 app.get("/api/profile", authenticateToken, async (req, res) => {
   try {
-    const users = await db.query("SELECT id, email, name, role, created_at FROM users WHERE id = ?", [req.user.userId])
+    const users = await db.query("SELECT id, email, name, created_at FROM users WHERE id = ?", [req.user.userId])
 
     if (users.length === 0) {
       return res.status(404).json({ message: "Usuario no encontrado" })
