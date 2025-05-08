@@ -103,6 +103,30 @@ api.interceptors.response.use(
         })
       }
 
+      // Manejar error 403 (Prohibido)
+      if (error.response.status === 403) {
+        console.error("Error 403: Acceso prohibido")
+
+        // Determinar si es un problema de token o de permisos
+        const errorData = error.response.data || {}
+        const errorType = errorData.error || "FORBIDDEN"
+
+        // Si es un problema de token, limpiar sesión
+        if (errorType === "INVALID_TOKEN" || errorType === "TOKEN_EXPIRED") {
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("token")
+            localStorage.removeItem("user")
+          }
+        }
+
+        return Promise.reject({
+          message: errorData.message || "No tienes permiso para acceder a este recurso.",
+          status: 403,
+          isAuthError: true,
+          errorType: errorType,
+        })
+      }
+
       // Si es un error 500, proporcionar un mensaje más amigable
       if (error.response.status === 500) {
         console.error("Error 500 del servidor:", error.response.data)

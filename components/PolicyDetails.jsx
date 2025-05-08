@@ -7,9 +7,8 @@ import { motion } from "framer-motion"
 import { Shield, Calendar, AlertTriangle, CheckCircle, Clock, X, FileText, User, Home, Car, Heart } from "lucide-react"
 import { policyService } from "../services/api"
 
-import { handleApiError } from "../backend/error-handler"
-
-
+// Import the error handler utility
+import { handleApiError, createFallbackResponse } from "../backend/error-handler"
 
 // Función para formatear fechas
 const formatDate = (dateString) => {
@@ -103,39 +102,59 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [cancelSuccess, setCancelSuccess] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
-  // In the useEffect for fetching policy details, update the catch block:
-  useEffect(() => {
-    const fetchPolicyDetails = async () => {
-      try {
-        setLoading(true)
-        setError(null)
+  // Función para cargar los detalles de la póliza
+  const fetchPolicyDetails = async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
-        // Obtener detalles de la póliza
-        const policyDetails = await policyService.getPolicyDetails(policyId)
-        setPolicy(policyDetails)
-      } catch (err) {
-        console.error("Error al cargar detalles de la póliza:", err)
+      console.log(`Intentando cargar detalles de la póliza ID: ${policyId} (intento ${retryCount + 1})`)
 
-        // Use our error handler utility
-        handleApiError(err, setError, setLoading, false)
+      // Obtener detalles de la póliza
+      const policyDetails = await policyService.getPolicyDetails(policyId)
 
-        // For 500 errors or network errors, use fallback data in development
-        if (err.isServerError || err.status === 500 || err.code === "NETWORK_ERROR" || err.code === "NO_RESPONSE") {
-          console.log("Usando datos de respaldo para detalles de póliza")
-          setPolicy(createFallbackResponse("policy"))
-        }
-      } finally {
-        setLoading(false)
+      // Verificar si los datos recibidos son válidos
+      if (!policyDetails || (!policyDetails.id && !policyDetails.policy)) {
+        console.error("Datos de póliza inválidos recibidos:", policyDetails)
+        throw new Error("Los datos de la póliza recibidos son inválidos")
       }
-    }
 
+      // Normalizar la estructura de datos
+      const normalizedPolicy = policyDetails.policy || policyDetails
+
+      console.log("Detalles de póliza cargados correctamente:", normalizedPolicy)
+      setPolicy(normalizedPolicy)
+    } catch (err) {
+      console.error("Error al cargar detalles de la póliza:", err)
+
+      // Use our error handler utility
+      handleApiError(err, setError, setLoading, false)
+
+      // For 500 errors or network errors, use fallback data in development
+      if (err.isServerError || err.status === 500 || err.code === "NETWORK_ERROR" || err.code === "NO_RESPONSE") {
+        console.log("Usando datos de respaldo para detalles de póliza")
+        setPolicy(createFallbackResponse("policy"))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Cargar detalles de la póliza cuando cambia el ID
+  useEffect(() => {
     if (policyId) {
       fetchPolicyDetails()
     }
-  }, [policyId])
+  }, [policyId, retryCount])
 
-  // Also update the handleCancelPolicy function:
+  // Función para reintentar la carga de datos
+  const handleRetry = () => {
+    setRetryCount((prev) => prev + 1)
+  }
+
+  // Manejar cancelación de póliza
   const handleCancelPolicy = async () => {
     try {
       setCancelling(true)
@@ -245,9 +264,17 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
             <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-800 mb-2">Error</h3>
             <p className="text-gray-600">{error}</p>
-            <button className="mt-4 px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500" onClick={onClose}>
-              Cerrar
-            </button>
+            <div className="mt-4 flex justify-center space-x-4">
+              <button className="px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500" onClick={handleRetry}>
+                Reintentar
+              </button>
+              <button
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                onClick={onClose}
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         ) : cancelSuccess ? (
           <div className="p-8 text-center">
