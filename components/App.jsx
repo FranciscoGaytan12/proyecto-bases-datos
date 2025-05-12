@@ -12,9 +12,11 @@ import Footer from "./Footer"
 import Login from "./Login"
 import Register from "../Register"
 import { authService } from "../services/api"
-// Importar el componente ProfilePage
+// Importar los componentes de perfil y dashboard
 import ProfilePage from "./profile-page"
 import Dashboard from "./Dashboard"
+// Importar el componente AdminPanel
+import AdminPanel from "./AdminPanel"
 
 function App() {
   const { scrollYProgress } = useScroll()
@@ -25,6 +27,8 @@ function App() {
   // Variables de estado para controlar la visualización
   const [showProfile, setShowProfile] = useState(false)
   const [showDashboard, setShowDashboard] = useState(false)
+  // Variable de estado para controlar la visualización del panel de administración
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
 
   // Verificar si el usuario está autenticado al cargar la página
   useEffect(() => {
@@ -66,10 +70,20 @@ function App() {
     setIsRegisterOpen(false)
   }
 
+  // Función para manejar la navegación al panel de administración
+  const handleAdminPanelClick = () => {
+    setShowAdminPanel(true)
+    setShowProfile(false)
+    setShowDashboard(false)
+    setIsLoginOpen(false)
+    setIsRegisterOpen(false)
+  }
+
   // Función para manejar el regreso a la página principal
   const handleGoHome = () => {
     setShowProfile(false)
     setShowDashboard(false)
+    setShowAdminPanel(false)
   }
 
   const handleLogout = () => {
@@ -78,18 +92,21 @@ function App() {
     setUser(null)
     setShowProfile(false)
     setShowDashboard(false)
+    setShowAdminPanel(false)
   }
 
+  // Modificar el return para incluir el AdminPanel
   return (
     <div className="min-h-screen bg-amber-50">
       {/* Barra de progreso */}
-      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 z-50" style={{ scaleX: scrollYProgress }} />
+      <motion.div className="fixed top-0 left-0 right-0 h-1 bg-amber-600 z-50" style={{ scaleX: scrollYProgress }} />
 
       <Header
         onLoginClick={handleLoginClick}
         onRegisterClick={handleRegisterClick}
         onProfileClick={handleProfileClick}
         onDashboardClick={handleDashboardClick}
+        onAdminPanelClick={handleAdminPanelClick}
         onLogout={handleLogout}
         isAuthenticated={isAuthenticated}
         user={user}
@@ -99,6 +116,8 @@ function App() {
         <ProfilePage onGoHome={handleGoHome} />
       ) : showDashboard ? (
         <Dashboard onGoHome={handleGoHome} />
+      ) : showAdminPanel ? (
+        <AdminPanel onGoBack={handleGoHome} />
       ) : (
         <main>
           <Hero />

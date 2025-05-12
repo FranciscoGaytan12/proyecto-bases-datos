@@ -1,10 +1,19 @@
 "use client"
 
-import { Shield, Menu, X, User, LogOut, LayoutDashboard } from "lucide-react"
+import { Shield, Menu, X, User, LogOut, LayoutDashboard, Settings } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
-function Header({ onLoginClick, onRegisterClick, onProfileClick, onDashboardClick, onLogout, isAuthenticated, user }) {
+function Header({
+  onLoginClick,
+  onRegisterClick,
+  onProfileClick,
+  onDashboardClick,
+  onAdminPanelClick,
+  onLogout,
+  isAuthenticated,
+  user,
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
 
@@ -35,7 +44,7 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onDashboardClic
         </motion.button>
 
         {/* Desktop navigation */}
-        <nav className="hidden md:flex items-center space-x-4 ">
+        <nav className="hidden md:flex items-center space-x-4">
           <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
             <a href="#" className="text-gray-700 hover:text-blue-400 transition-colors">
               Inicio
@@ -124,6 +133,21 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onDashboardClic
                       <LayoutDashboard className="h-4 w-4 mr-2" />
                       Dashboard
                     </button>
+                    {/* Mostrar botón de administración solo para usuarios admin */}
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={() => {
+                          setIsProfileMenuOpen(false)
+                          if (typeof onAdminPanelClick === "function") {
+                            onAdminPanelClick()
+                          }
+                        }}
+                        className="flex items-center w-full text-left px-4 py-2 text-sm text-purple-600 hover:bg-purple-50"
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Panel Admin
+                      </button>
+                    )}
                     <button
                       onClick={onLogout}
                       className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
@@ -273,6 +297,20 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onDashboardClic
                       <LayoutDashboard className="h-4 w-4 mr-2" />
                       Dashboard
                     </button>
+                    {user?.role === "admin" && (
+                      <button
+                        onClick={() => {
+                          setIsMenuOpen(false)
+                          if (typeof onAdminPanelClick === "function") {
+                            onAdminPanelClick()
+                          }
+                        }}
+                        className="flex items-center text-purple-600 hover:text-purple-700 transition-colors py-2"
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Panel Admin
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setIsMenuOpen(false)
@@ -325,4 +363,3 @@ function Header({ onLoginClick, onRegisterClick, onProfileClick, onDashboardClic
 }
 
 export default Header
-
