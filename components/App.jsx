@@ -117,7 +117,7 @@ function App() {
       ) : showDashboard ? (
         <Dashboard onGoHome={handleGoHome} />
       ) : showAdminPanel ? (
-        <AdminPanel onGoBack={handleGoHome} />
+        <AdminPanel onGoBack={handleGoHome}/>
       ) : (
         <main>
           <Hero />

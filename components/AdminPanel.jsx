@@ -18,7 +18,7 @@ function AdminPanel({ onGoBack }) {
   // Cargar todos los usuarios al montar el componente
   useEffect(() => {
     fetchUsers()
-  }, [])
+  }, [])  
 
   // Función para cargar todos los usuarios
   const fetchUsers = async () => {

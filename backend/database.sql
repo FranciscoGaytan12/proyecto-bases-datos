@@ -76,3 +76,4 @@ INSERT INTO users (email, password, name) VALUES
 ('admin@segurototal.com', '$2b$10$X7KAdjZq8VN7A.k5E4QIAOk/HSOkzR.Hl5JQwGdmWUKyb8vTUvhie', 'Administrador'), -- contraseña: admin123
 ('usuario@ejemplo.com', '$2b$10$NlUO.wSH3TS1UUJPi1QOqOSbmXG7FwNjQ9l5FrKEEMaUIPvFwQXcO', 'Usuario Ejemplo'); -- contraseña: password123
 
+  

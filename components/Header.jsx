@@ -147,9 +147,12 @@ function Header({
                         <Settings className="h-4 w-4 mr-2" />
                         Panel Admin
                       </button>
-                    )}
-                    <button
-                      onClick={onLogout}
+                    )}    
+                      <button
+                      onClick={() => {
+                        setIsProfileMenuOpen(false)
+                        onLogout()
+                      }}
                       className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
