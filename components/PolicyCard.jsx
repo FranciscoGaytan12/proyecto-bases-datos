@@ -1,9 +1,10 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Shield, AlertTriangle, CheckCircle, Clock } from "lucide-react"
+import { Shield, AlertTriangle, CheckCircle, Clock, Trash2 } from "lucide-react"
 import { useState } from "react"
 import PolicyDetails from "./PolicyDetails"
+import { policyService } from "../services/api"
 
 // Función para formatear fechas
 const formatDate = (dateString) => {
@@ -60,8 +61,11 @@ const statusConfig = {
   },
 }
 
-function PolicyCard({ policy, onPolicyUpdate }) {
+function PolicyCard({ policy, onPolicyUpdate, onPolicyDelete }) {
   const [showDetails, setShowDetails] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState(null)
   const status = statusConfig[policy.status] || statusConfig.pending
   const StatusIcon = status.icon
 
@@ -76,6 +80,39 @@ function PolicyCard({ policy, onPolicyUpdate }) {
 
     // Cerrar el modal de detalles
     setShowDetails(false)
+  }
+
+  const handleDeleteClick = (e) => {
+    e.stopPropagation()
+    setShowDeleteConfirm(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    try {
+      setIsDeleting(true)
+      setDeleteError(null)
+
+      // Llamar al servicio para eliminar la póliza
+      await policyService.deletePolicy(policy.id)
+
+      // Notificar al componente padre
+      if (onPolicyDelete) {
+        onPolicyDelete(policy.id)
+      }
+
+      // Cerrar el modal de confirmación
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error("Error al eliminar la póliza:", error)
+      setDeleteError(error.message || "Error al eliminar la póliza")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirm(false)
+    setDeleteError(null)
   }
 
   return (
@@ -131,16 +168,28 @@ function PolicyCard({ policy, onPolicyUpdate }) {
               Ver detalles
             </motion.button>
 
-            {policy.status === "active" && (
+            <div className="flex space-x-3">
+              {policy.status === "active" && (
+                <motion.button
+                  className="text-red-500 hover:text-red-600 text-sm font-medium"
+                  whileHover={{ x: 3 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  onClick={() => setShowDetails(true)}
+                >
+                  Reportar siniestro
+                </motion.button>
+              )}
+
               <motion.button
-                className="text-red-500 hover:text-red-600 text-sm font-medium"
+                className="text-gray-500 hover:text-red-600 text-sm font-medium flex items-center"
                 whileHover={{ x: 3 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                onClick={() => setShowDetails(true)}
+                onClick={handleDeleteClick}
               >
-                Reportar siniestro
+                <Trash2 className="h-4 w-4 mr-1" />
+                Eliminar
               </motion.button>
-            )}
+            </div>
           </div>
         </div>
       </motion.div>
@@ -152,6 +201,46 @@ function PolicyCard({ policy, onPolicyUpdate }) {
           onClose={() => setShowDetails(false)}
           onPolicyCancelled={handlePolicyCancelled}
         />
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirmar Eliminación</h3>
+
+            {deleteError && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md">{deleteError}</div>}
+
+            <p className="text-gray-600 mb-6">
+              ¿Estás seguro de que deseas eliminar esta póliza? Esta acción no se puede deshacer y eliminará todos los
+              datos relacionados, incluyendo pagos y reclamaciones.
+            </p>
+
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                onClick={handleDeleteCancel}
+                disabled={isDeleting}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <span className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Eliminando...
+                  </span>
+                ) : (
+                  "Sí, Eliminar Póliza"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   )
