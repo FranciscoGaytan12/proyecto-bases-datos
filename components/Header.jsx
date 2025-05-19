@@ -1,7 +1,7 @@
 "use client"
 
 import { Shield, Menu, X, User, LogOut, LayoutDashboard, Settings } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
 function Header({
@@ -12,10 +12,44 @@ function Header({
   onAdminPanelClick,
   onLogout,
   isAuthenticated,
+  isAdmin,
   user,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [showAdminButton, setShowAdminButton] = useState(false)
+
+  // Efecto para mostrar información de depuración en la consola
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("Header - Usuario autenticado:", user)
+      console.log("Header - Es administrador:", isAdmin)
+      console.log("Header - Rol del usuario:", user?.role)
+
+      // Determinar si mostrar el botón de administrador
+      const shouldShowAdminButton = isAdmin || ( password && user.role === "admin")
+      console.log("¿Mostrar botón de administrador?", shouldShowAdminButton)
+      setShowAdminButton(shouldShowAdminButton)
+    } else {
+      setShowAdminButton(true)
+    }
+  }, [isAuthenticated, user, isAdmin])
+
+  // Escuchar eventos de inicio de sesión
+  useEffect(() => {
+    const handleUserLoggedIn = (event) => {
+      console.log("Evento de inicio de sesión recibido:", event.detail)
+      if (event.detail.isAdmin || (event.detail.user && event.detail.user.role === "admin")) {
+        setShowAdminButton(true)
+      }
+    }
+
+    window.addEventListener("userLoggedIn", handleUserLoggedIn)
+
+    return () => {
+      window.removeEventListener("userLoggedIn", handleUserLoggedIn)
+    }
+  }, [])
 
   return (
     <motion.header
@@ -133,8 +167,9 @@ function Header({
                       <LayoutDashboard className="h-4 w-4 mr-2" />
                       Dashboard
                     </button>
+
                     {/* Mostrar botón de administración solo para usuarios admin */}
-                    {user?.role === "admin" && (
+                    {showAdminButton && (
                       <button
                         onClick={() => {
                           setIsProfileMenuOpen(false)
@@ -147,12 +182,10 @@ function Header({
                         <Settings className="h-4 w-4 mr-2" />
                         Panel Admin
                       </button>
-                    )}    
-                      <button
-                      onClick={() => {
-                        setIsProfileMenuOpen(false)
-                        onLogout()
-                      }}
+                    )}
+
+                    <button
+                      onClick={onLogout}
                       className="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
@@ -300,7 +333,9 @@ function Header({
                       <LayoutDashboard className="h-4 w-4 mr-2" />
                       Dashboard
                     </button>
-                    {user?.role === "admin" && (
+
+                    {/* Mostrar botón de administración solo para usuarios admin */}
+                    {showAdminButton && (
                       <button
                         onClick={() => {
                           setIsMenuOpen(false)
@@ -314,6 +349,7 @@ function Header({
                         Panel Admin
                       </button>
                     )}
+
                     <button
                       onClick={() => {
                         setIsMenuOpen(false)

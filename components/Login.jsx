@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { X, Mail, Lock, Eye, EyeOff, AlertCircle, AlertTriangle } from "lucide-react"
+import { X, Mail, Lock, Eye, EyeOff, AlertCircle, AlertTriangle, Loader } from "lucide-react"
 import { authService } from "../services/api"
+import api from "../services/api"
 
-function Login({ isOpen, onClose, onRegisterClick }) {
+function Login({ isOpen, onClose, onRegisterClick, onLoginSuccess }) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -13,7 +14,7 @@ function Login({ isOpen, onClose, onRegisterClick }) {
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [apiError, setApiError] = useState("")
-  const [apiErrorType, setApiErrorType] = useState("") // Para controlar el tipo de error
+  const [apiErrorType, setApiErrorType] = useState("")
   const [loginAttempts, setLoginAttempts] = useState(0)
 
   // Limpiar errores cuando se abre el modal
@@ -63,13 +64,54 @@ function Login({ isOpen, onClose, onRegisterClick }) {
 
         // Llamar al servicio de autenticación
         const response = await authService.login(email, password)
-
         console.log("Inicio de sesión exitoso:", response)
+
+        // Verificar explícitamente si el usuario es administrador
+        let isAdmin = false
+        try {
+          const adminCheckResponse = await api.get("/diagnostic/check-admin", {
+            headers: {
+              Authorization: `Bearer ${response.token}`,
+            },
+          })
+          console.log("Verificación de admin después de login:", adminCheckResponse.data)
+          isAdmin = adminCheckResponse.data.isAdmin
+
+          // Si el usuario es admin pero no tiene el rol en el objeto user, actualizarlo
+          if (isAdmin && response.user && response.user.role !== "admin") {
+            response.user.role = "admin"
+            // Actualizar en localStorage
+            localStorage.setItem("user", JSON.stringify(response.user))
+            console.log("Usuario actualizado como admin en localStorage después de login")
+          }
+        } catch (adminError) {
+          console.error("Error al verificar si es admin después de login:", adminError)
+        }
 
         // Si se seleccionó "Recordarme", podríamos guardar alguna preferencia aquí
 
+        // Llamar al callback de éxito si existe
+        if (typeof onLoginSuccess === "function") {
+          onLoginSuccess({
+            ...response,
+            user: {
+              ...response.user,
+              role: isAdmin ? "admin" : response.user.role || "user",
+            },
+          })
+        }
+
         // Cerrar el modal
         onClose()
+
+        // Disparar un evento personalizado para notificar que el usuario ha iniciado sesión
+        const event = new CustomEvent("userLoggedIn", {
+          detail: {
+            user: response.user,
+            isAdmin: isAdmin,
+          },
+        })
+        window.dispatchEvent(event)
 
         // Recargar la página o redirigir al usuario
         // Usamos setTimeout para evitar problemas con la actualización del estado
@@ -355,7 +397,14 @@ function Login({ isOpen, onClose, onRegisterClick }) {
                 whileTap={!isLoading ? { scale: 0.98 } : {}}
                 disabled={isLoading}
               >
-                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <Loader className="animate-spin h-5 w-5 mr-2" />
+                    <span>Iniciando sesión...</span>
+                  </div>
+                ) : (
+                  "Iniciar Sesión"
+                )}
               </motion.button>
             </div>
           </form>
@@ -393,4 +442,3 @@ function Login({ isOpen, onClose, onRegisterClick }) {
 }
 
 export default Login
-

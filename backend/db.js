@@ -130,7 +130,7 @@ async function initializeDatabase() {
 
       await connection.query(
         `
-        INSERT INTO users (email, password, name, role) 
+        INSERT INTO users (email, password, name, roles) 
         VALUES ('admin@segurototal.com', ?, 'Administrador', 'admin')
       `,
         [hashedPassword],
