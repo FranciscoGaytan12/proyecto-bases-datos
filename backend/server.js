@@ -318,7 +318,44 @@ app.get("/api/test-db", async (req, res) => {
     res.status(500).json({ message: "Error al conectar con la base de datos", error: error.message })
   }
 })
+// Ruta para crear un nuevo pago
+app.post("/api/payments", authenticateToken, async (req, res) => {
+  let connection
+  try {
+    const result = await connection.query(
+      `INSERT INTO payments (policy_id, amount, payment_date, payment_method, transaction_id, status, card_last_four, card_holder)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [policy_id, amount, payment_date, payment_method, transaction_id, status, card_last_four, card_holder]
+    )
 
+
+    // Validar datos
+    if (!policy_id || !amount || !payment_date || !payment_method || !transaction_id || !status) {
+      return res.status(400).json({ message: "Todos los campos son requeridos" })
+    }
+
+    // Iniciar transacción
+    connection = await db.getTransaction()
+
+    // Insertar pago
+   
+    // Confirmar transacción
+    await db.commitTransaction(connection)
+
+ 
+    res.status(201).json({
+      message: "Pago registrado exitosamente",
+      payment_id: result[0].insertId
+    })
+  } catch (error) {
+    // Revertir transacción en caso de error
+    if (connection) {
+      await db.rollbackTransaction(connection)
+    }
+    console.error("Error al registrar pago:", error)
+    res.status(500).json({ message: "Error interno del servidor" })
+  }
+})
 // Iniciar servidor
 app.listen(PORT, async () => {
   console.log(`🚀 Servidor corriendo en el puerto ${PORT}`)

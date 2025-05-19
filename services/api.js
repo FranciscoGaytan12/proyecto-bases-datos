@@ -786,6 +786,77 @@ export const policyService = {
       throw { message: "Error al crear reclamación" }
     }
   },
+  // Eliminar una póliza
+  deletePolicy: async (policyId) => {
+    try {
+      console.log(`Eliminando póliza ID: ${policyId}`)
+
+      // Intentar hacer la petición al servidor
+      try {
+        const response = await api.delete(`/policies/${policyId}`)
+        console.log("Respuesta de eliminación de póliza:", response.data)
+        return response.data
+      } catch (error) {
+        console.error("Error al eliminar póliza en el servidor:", error)
+
+        // Si es un error 404, proporcionar un mensaje más claro
+        if (error.response && error.response.status === 404) {
+          console.error("Ruta no encontrada o póliza no existe")
+          throw {
+            message: "No se pudo eliminar la póliza. La ruta no existe o la póliza ya fue eliminada.",
+            status: 404,
+            isNotFoundError: true,
+          }
+        }
+
+        // Si es un error de autenticación, propagar el error
+        if (error.isAuthError || (error.response && (error.response.status === 401 || error.response.status === 403))) {
+          console.error("Error de autenticación al eliminar póliza")
+          authService.logout()
+          throw {
+            message: "No tienes permiso para eliminar esta póliza. Por favor, inicia sesión nuevamente.",
+            status: error.response ? error.response.status : 401,
+            isAuthError: true,
+          }
+        }
+
+        // Si es un error del servidor, propagar el error
+        if (error.isServerError || (error.response && error.response.status === 500)) {
+          console.error("Error del servidor al eliminar póliza")
+          throw {
+            message: "Error en el servidor al eliminar la póliza. Por favor, inténtalo más tarde.",
+            status: 500,
+            isServerError: true,
+          }
+        }
+
+        // Para errores de red u otros errores
+        if (!error.response) {
+          console.error("Error de red al eliminar póliza")
+          throw {
+            message: "Error de conexión. Verifica tu conexión a internet y que el servidor esté en ejecución.",
+            code: error.code || "NETWORK_ERROR",
+          }
+        }
+
+        // Propagar otros errores
+        throw error.response ? error.response.data : error
+      }
+    } catch (error) {
+      console.error("Error completo al eliminar póliza:", error)
+
+      // Si el error ya tiene un formato estructurado, usarlo directamente
+      if (error.message) {
+        throw error
+      }
+
+      // Si llegamos aquí, es un error no manejado
+      throw {
+        message: "Error inesperado al eliminar la póliza. Por favor, inténtalo de nuevo.",
+        code: "UNEXPECTED_ERROR",
+      }
+    }
+  },
 }
 
 // Actualizar el servicio de administración (solo para usuarios admin)

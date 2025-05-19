@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { CreditCard, Calendar, Lock, Check, AlertCircle, User } from "lucide-react"
+import { paymentService } from "../services/payment-service"
 
 function CheckoutProcess({ policyData, onComplete, onCancel }) {
   const [paymentData, setPaymentData] = useState({
@@ -126,8 +127,35 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
       try {
         setIsLoading(true)
 
-        // Simular procesamiento de pago
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+        // Crear objeto de pago para la base de datos
+        const paymentRecord = {
+          policy_id: policyData.id,
+          amount: policyData.premium * 1.21, // Incluir impuestos
+          payment_date: new Date().toISOString(),
+          payment_method: paymentData.payment_method,
+          transaction_id: `TR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          status: "completed",
+          // Datos adicionales para referencia (estos no se guardan en la tabla payments)
+          card_info: {
+            last_four: paymentData.card_number.replace(/\s/g, "").slice(-4),
+            expiry_date: paymentData.expiry_date,
+            card_holder: paymentData.card_holder,
+          },
+        }
+
+        console.log("Guardando pago en la base de datos:", paymentRecord)
+
+        // Guardar el pago en la base de datos
+        try {
+          const result = await paymentService.createPayment(paymentRecord)
+          console.log("Pago guardado exitosamente:", result)
+        } catch (dbError) {
+          console.error("Error al guardar el pago en la base de datos:", dbError)
+          // Continuar con el proceso aunque falle el guardado en la base de datos
+        }
+
+        // Simular procesamiento de pago (para desarrollo)
+        await new Promise((resolve) => setTimeout(resolve, 1500))
 
         // Llamar a la función onComplete pasada como prop
         onComplete({
@@ -136,7 +164,7 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
           card_number: paymentData.card_number.replace(/\s/g, ""),
           // Añadir timestamp de la transacción
           transaction_date: new Date().toISOString(),
-          transaction_id: `TR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          transaction_id: paymentRecord.transaction_id,
           status: "completed",
         })
       } catch (error) {

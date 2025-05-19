@@ -1,5 +1,5 @@
 "use client"
-
+import paymentHistory from "./paymentHistory"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Shield, AlertCircle, ChevronRight, ArrowLeft } from "lucide-react"
@@ -54,6 +54,8 @@ function Dashboard({ onGoHome }) {
             throw new Error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
           }
         }
+
+
 
         // Cargar pólizas del usuario
         await fetchUserPolicies()
@@ -348,7 +350,7 @@ function Dashboard({ onGoHome }) {
                     </div>
                   )}
                 </div>
-
+  
                 {/* Sección de pólizas disponibles */}
                 <div>
                   <div className="flex justify-between items-center mb-6">
@@ -393,11 +395,14 @@ function Dashboard({ onGoHome }) {
                 />
               </div>
             )}
+         
           </div>
         </div>
       </div>
     </div>
   )
+
+
 }
 
 // Función auxiliar para obtener el nombre legible del tipo de póliza
