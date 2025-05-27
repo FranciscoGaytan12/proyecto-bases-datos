@@ -60,12 +60,49 @@ export const paymentService = {
     try {
       console.log("Creando nuevo pago:", paymentData)
 
+      // Validar datos requeridos
+      if (!paymentData.policy_id) {
+        throw new Error("El ID de la póliza es requerido")
+      }
+      if (!paymentData.amount || isNaN(paymentData.amount) || paymentData.amount <= 0) {
+        throw new Error("El monto del pago es inválido")
+      }
+      if (!paymentData.payment_method) {
+        throw new Error("El método de pago es requerido")
+      }
+
+      // Normalizar el método de pago
+      const normalizePaymentMethod = (method) => {
+        const methodMap = {
+          credit_card: "credit_card",
+          creditcard: "credit_card",
+          "credit-card": "credit_card",
+          tarjeta_credito: "credit_card",
+          debit_card: "debit_card",
+          debitcard: "debit_card",
+          "debit-card": "debit_card",
+          tarjeta_debito: "debit_card",
+          bank_transfer: "bank_transfer",
+          transfer: "bank_transfer",
+          transferencia: "bank_transfer",
+          cash: "cash",
+          efectivo: "cash",
+          paypal: "paypal",
+          stripe: "stripe",
+          mercado_pago: "mercado_pago",
+        }
+
+        const normalized = methodMap[method?.toLowerCase()] || "credit_card"
+        console.log(`Método de pago normalizado: "${method}" -> "${normalized}"`)
+        return normalized
+      }
+
       // Asegurarse de que los datos tengan el formato correcto
       const formattedData = {
         policy_id: paymentData.policy_id,
         amount: Number.parseFloat(paymentData.amount),
         payment_date: paymentData.payment_date || new Date().toISOString(),
-        payment_method: paymentData.payment_method,
+        payment_method: normalizePaymentMethod(paymentData.payment_method),
         transaction_id: paymentData.transaction_id || `TR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         status: paymentData.status || "completed",
         card_info: paymentData.card_info || null,
@@ -73,20 +110,49 @@ export const paymentService = {
 
       console.log("Datos formateados:", formattedData)
 
-      const response = await api.post("/payments", formattedData)
-      console.log("Respuesta del servidor:", response.data)
-      return response.data
+      // Intentar realizar el pago con reintentos
+      const result = await retryApiCall(
+        async () => {
+          const response = await api.post("/payments", formattedData)
+
+          // Validar la respuesta del backend
+          if (!response.data || !response.data.payment || !response.data.payment.id) {
+            throw new Error("La respuesta del servidor es inválida")
+          }
+
+          return response.data.payment
+        },
+        {
+          maxRetries: 2,
+          shouldRetry: (error) => {
+            return (
+              error.status === 500 ||
+              error.isServerError ||
+              error.code === "NETWORK_ERROR" ||
+              error.code === "ECONNABORTED" ||
+              error.code === "NO_RESPONSE"
+            )
+          },
+        }
+      )
+
+      console.log("Pago creado exitosamente:", result)
+      return result
     } catch (error) {
-      console.error("Error al crear pago:", error)
-      console.error("Detalles del error:", error.response?.data || error.message)
+      console.error("Error al crear el pago:", error)
 
-      // Si es un error de autenticación, propagar el error
+      // Propagar errores específicos
       if (error.isAuthError || error.status === 401 || error.status === 403) {
-        throw error
+        throw new Error("No tienes permiso para realizar esta operación")
+      } else if (error.status === 404) {
+        throw new Error("La póliza especificada no existe")
+      } else if (error.status === 409) {
+        throw new Error("El pago ya existe en el sistema")
+      } else if (error.status === 422) {
+        throw new Error("Los datos del pago son inválidos: " + (error.message || "Error de validación"))
+      } else {
+        throw new Error("Error al procesar el pago: " + (error.message || "Error del servidor"))
       }
-
-      // Para otros errores, propagar el error
-      throw error
     }
   },
 

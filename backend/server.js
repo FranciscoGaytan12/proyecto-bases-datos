@@ -95,25 +95,33 @@ app.post("/api/register", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body
+    console.log("Login attempt:", { email })
 
     // Validar datos
     if (!email || !password) {
+      console.log("Missing email or password")
       return res.status(400).json({ message: "Email y contraseña son requeridos" })
     }
 
     // Buscar usuario
     const users = await db.query("SELECT * FROM users WHERE email = ?", [email])
+    console.log("Found users:", users.length)
 
     if (users.length === 0) {
+      console.log("No user found with email:", email)
       return res.status(401).json({ message: "Credenciales inválidas" })
     }
 
     const user = users[0]
+    console.log("Found user:", { id: user.id, email: user.email, role: user.role })
 
     // Verificar contraseña
+    console.log("Comparing passwords...")
     const passwordMatch = await bcrypt.compare(password, user.password)
+    console.log("Password match:", passwordMatch)
 
     if (!passwordMatch) {
+      console.log("Invalid password for user:", email)
       return res.status(401).json({ message: "Credenciales inválidas" })
     }
 
@@ -121,8 +129,10 @@ app.post("/api/login", async (req, res) => {
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET || "your_jwt_secret",
-      { expiresIn: "1h" },
+      { expiresIn: "1h" }
     )
+
+    console.log("Login successful, generated token")
 
     // Enviar respuesta
     res.json({
@@ -132,8 +142,8 @@ app.post("/api/login", async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        
-      },
+        role: user.role
+      }
     })
   } catch (error) {
     console.error("Error al iniciar sesión:", error)
@@ -303,6 +313,16 @@ app.get("/api/admin/users", authenticateToken, isAdmin, async (req, res) => {
   }
 })
 
+// Importar rutas de comentarios
+const commentRoutes = require('./routes/comment-routes')
+// Importar rutas de pagos
+const paymentRoutes = require('./routes/payment-routes')
+
+// Usar rutas de comentarios bajo el prefijo /api/comments
+app.use('/api/comments', commentRoutes)
+// Usar rutas de pagos bajo el prefijo /api/payments
+app.use('/api/payments', paymentRoutes)
+
 // Ruta de prueba
 app.get("/api/test", (req, res) => {
   res.json({ message: "API funcionando correctamente", timestamp: new Date().toISOString() })
@@ -318,44 +338,7 @@ app.get("/api/test-db", async (req, res) => {
     res.status(500).json({ message: "Error al conectar con la base de datos", error: error.message })
   }
 })
-// Ruta para crear un nuevo pago
-app.post("/api/payments", authenticateToken, async (req, res) => {
-  let connection
-  try {
-    const result = await connection.query(
-      `INSERT INTO payments (policy_id, amount, payment_date, payment_method, transaction_id, status, card_last_four, card_holder)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [policy_id, amount, payment_date, payment_method, transaction_id, status, card_last_four, card_holder]
-    )
-
-
-    // Validar datos
-    if (!policy_id || !amount || !payment_date || !payment_method || !transaction_id || !status) {
-      return res.status(400).json({ message: "Todos los campos son requeridos" })
-    }
-
-    // Iniciar transacción
-    connection = await db.getTransaction()
-
-    // Insertar pago
-   
-    // Confirmar transacción
-    await db.commitTransaction(connection)
-
- 
-    res.status(201).json({
-      message: "Pago registrado exitosamente",
-      payment_id: result[0].insertId
-    })
-  } catch (error) {
-    // Revertir transacción en caso de error
-    if (connection) {
-      await db.rollbackTransaction(connection)
-    }
-    console.error("Error al registrar pago:", error)
-    res.status(500).json({ message: "Error interno del servidor" })
-  }
-})
+// Las rutas de pagos se manejan en routes/payment-routes.js
 // Iniciar servidor
 app.listen(PORT, async () => {
   console.log(`🚀 Servidor corriendo en el puerto ${PORT}`)
@@ -368,4 +351,3 @@ app.listen(PORT, async () => {
     await db.initializeDatabase()
   }
 })
-

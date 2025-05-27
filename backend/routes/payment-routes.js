@@ -77,21 +77,22 @@ router.post("/", authenticateToken, async (req, res) => {
   let connection
   try {
     const paymentData = req.body
-    console.log(`Creando nuevo pago para póliza ID: ${paymentData.policy_id}`, paymentData)
+    console.log("Creando nuevo pago para póliza ID:", paymentData.policy_id)
+    console.log("Datos recibidos:", paymentData)
 
     // Validar datos básicos
     if (!paymentData.policy_id || !paymentData.amount || !paymentData.payment_method) {
-      console.log(`Validación fallida: datos incompletos`)
+      console.log("Validación fallida: datos incompletos")
       return res.status(400).json({
         message: "Datos incompletos. Se requiere policy_id, amount y payment_method",
       })
     }
 
     // Verificar que la póliza exista y pertenezca al usuario
-    const policies = await db.query("SELECT * FROM policies WHERE id = ? AND user_id = ?", [
-      paymentData.policy_id,
-      req.user.userId,
-    ])
+    const policies = await db.query(
+      "SELECT * FROM policies WHERE id = ? AND user_id = ?",
+      [paymentData.policy_id, req.user.userId],
+    )
 
     if (policies.length === 0) {
       console.log(`Póliza ID: ${paymentData.policy_id} no encontrada para usuario ID: ${req.user.userId}`)
@@ -100,7 +101,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
     // Iniciar transacción
     connection = await db.getTransaction()
-    console.log(`Transacción iniciada`)
+    console.log("Transacción iniciada")
 
     // Preparar datos del pago
     const paymentRecord = {
@@ -110,41 +111,35 @@ router.post("/", authenticateToken, async (req, res) => {
       payment_method: paymentData.payment_method,
       transaction_id: paymentData.transaction_id || `TR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       status: paymentData.status || "completed",
-      card_last_four: paymentData.card_info?.last_four || null,
-      card_holder: paymentData.card_info?.card_holder || null,
+      card_last_four: paymentData.card_info?.last_four,
+      card_holder: paymentData.card_info?.card_holder,
     }
 
-    console.log("Datos del pago a insertar:", paymentRecord)
+    console.log("Datos preparados para inserción:", paymentRecord)
 
     // Insertar pago
-    const query = `
-      INSERT INTO payments 
-      (policy_id, amount, payment_date, payment_method, transaction_id, status, card_last_four, card_holder) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `
-
-    const params = [
-      paymentRecord.policy_id,
-      paymentRecord.amount,
-      paymentRecord.payment_date,
-      paymentRecord.payment_method,
-      paymentRecord.transaction_id,
-      paymentRecord.status,
-      paymentRecord.card_last_four,
-      paymentRecord.card_holder,
-    ]
-
-    console.log("Ejecutando query:", query)
-    console.log("Parámetros:", params)
-
-    const result = await connection.query(query, params)
+    const [result] = await connection.query(
+      `INSERT INTO payments 
+       (policy_id, amount, payment_date, payment_method, transaction_id, status, card_last_four, card_holder) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+      , [
+        paymentRecord.policy_id,
+        paymentRecord.amount,
+        paymentRecord.payment_date,
+        paymentRecord.payment_method,
+        paymentRecord.transaction_id,
+        paymentRecord.status,
+        paymentRecord.card_last_four,
+        paymentRecord.card_holder,
+      ]
+    )
 
     const paymentId = result.insertId
     console.log(`Pago insertado con ID: ${paymentId}`)
 
     // Confirmar transacción
     await db.commitTransaction(connection)
-    console.log(`Transacción confirmada`)
+    console.log("Transacción confirmada")
 
     res.status(201).json({
       message: "Pago registrado exitosamente",
@@ -154,7 +149,7 @@ router.post("/", authenticateToken, async (req, res) => {
   } catch (error) {
     // Revertir transacción en caso de error
     if (connection) {
-      console.log(`Revirtiendo transacción debido a error`)
+      console.log("Revirtiendo transacción debido a error")
       await db.rollbackTransaction(connection)
     }
     logError(error, req, "crear pago")

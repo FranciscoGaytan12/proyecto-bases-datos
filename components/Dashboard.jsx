@@ -1,15 +1,16 @@
 "use client"
-import paymentHistory from "./paymentHistory"
+
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { Shield, AlertCircle, ChevronRight, ArrowLeft } from "lucide-react"
+import { Shield, AlertCircle, ChevronRight, ArrowLeft, FileText } from "lucide-react"
 import { authService, policyService } from "../services/api"
 import PolicyCard from "./PolicyCard"
 import AvailablePolicies from "./AvailablePolicies"
 import PolicyForm from "./PolicyForm"
 import CheckoutProcess from "./CheckoutProcess"
+import ClaimsManagement from "./ClaimsManagement"
 // Import the error handler utility
-import { handleApiError, createFallbackResponse } from  "../backend/error-handler"
+import { handleApiError, createFallbackResponse } from "../backend/error-handler"
 
 function Dashboard({ onGoHome }) {
   const [user, setUser] = useState(null)
@@ -17,7 +18,7 @@ function Dashboard({ onGoHome }) {
   const [error, setError] = useState(null)
   const [userPolicies, setUserPolicies] = useState([])
   const [loadingPolicies, setLoadingPolicies] = useState(false)
-  const [view, setView] = useState("dashboard") // dashboard, buy, checkout
+  const [view, setView] = useState("dashboard") // dashboard, buy, checkout, claims
   const [selectedPolicyType, setSelectedPolicyType] = useState(null)
   const [policyData, setPolicyData] = useState(null)
   const [authError, setAuthError] = useState(false)
@@ -54,8 +55,6 @@ function Dashboard({ onGoHome }) {
             throw new Error("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.")
           }
         }
-
-
 
         // Cargar pólizas del usuario
         await fetchUserPolicies()
@@ -98,6 +97,29 @@ function Dashboard({ onGoHome }) {
         } else if (err.isAuthError || err.status === 401) {
           setAuthError(true)
           throw err
+        } else if (err.status === 403) {
+          console.error("Error 403 al cargar pólizas:", err)
+
+          // If it's a token issue, try to refresh the token
+          if (err.errorType === "INVALID_TOKEN" || err.errorType === "TOKEN_EXPIRED") {
+            console.log("Token inválido o expirado, intentando refrescar...")
+
+            try {
+              // Intentar refrescar el token
+
+              // Retry the request after refreshing
+              const userPolicies = await policyService.getPolicies()
+              setUserPolicies(userPolicies || [])
+              return
+            } catch (refreshError) {
+              console.error("Error al refrescar token:", refreshError)
+              setAuthError(true)
+              throw refreshError
+            }
+          }
+
+          // For other 403 errors, show an empty array
+          setUserPolicies([])
         } else {
           // For other errors, just show an empty array
           setUserPolicies([])
@@ -238,6 +260,11 @@ function Dashboard({ onGoHome }) {
     fetchData()
   }
 
+  // Manejar navegación a la gestión de siniestros
+  const handleClaimsClick = () => {
+    setView("claims")
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-amber-50 flex items-center justify-center">
@@ -329,7 +356,21 @@ function Dashboard({ onGoHome }) {
               <div>
                 {/* Sección de pólizas actuales */}
                 <div className="mb-10">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-6">Mis Pólizas Actuales</h2>
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-semibold text-gray-800">Mis Pólizas Actuales</h2>
+
+                    {/* Botón para ir a gestión de siniestros */}
+                    <motion.button
+                      onClick={handleClaimsClick}
+                      className="flex items-center text-blue-400 hover:text-blue-500 font-medium transition-colors"
+                      whileHover={{ x: 5 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                    >
+                      <FileText className="h-5 w-5 mr-2" />
+                      <span>Gestionar Siniestros</span>
+                      <ChevronRight className="h-5 w-5 ml-1" />
+                    </motion.button>
+                  </div>
 
                   {loadingPolicies ? (
                     <div className="text-center py-8">
@@ -350,7 +391,7 @@ function Dashboard({ onGoHome }) {
                     </div>
                   )}
                 </div>
-  
+
                 {/* Sección de pólizas disponibles */}
                 <div>
                   <div className="flex justify-between items-center mb-6">
@@ -395,14 +436,14 @@ function Dashboard({ onGoHome }) {
                 />
               </div>
             )}
-         
+
+            {/* Vista de gestión de siniestros */}
+            {view === "claims" && <ClaimsManagement onGoBack={() => setView("dashboard")} />}
           </div>
         </div>
       </div>
     </div>
   )
-
-
 }
 
 // Función auxiliar para obtener el nombre legible del tipo de póliza

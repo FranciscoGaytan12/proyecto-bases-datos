@@ -3,6 +3,7 @@ import axios from "axios"
 // Import the retry utility at the top of the file
 import { retryApiCall } from "../backend/api-retry"
 
+
 // Verificar la URL de la API
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
 console.log("API URL configurada:", API_URL)
@@ -463,29 +464,7 @@ export const policyService = {
         error.code === "NETWORK_ERROR" ||
         error.code === "NO_RESPONSE"
       ) {
-        console.log("Usando datos simulados para pólizas")
-        return [
-          {
-            id: 1,
-            policy_number: "POL-123456",
-            policy_type: "auto",
-            start_date: "2023-01-01",
-            end_date: "2024-01-01",
-            premium: 299,
-            coverage_amount: 50000,
-            status: "active",
-          },
-          {
-            id: 2,
-            policy_number: "POL-789012",
-            policy_type: "home",
-            start_date: "2023-02-15",
-            end_date: "2024-02-15",
-            premium: 199,
-            coverage_amount: 150000,
-            status: "active",
-          },
-        ]
+        
       }
 
       // Handle auth errors
@@ -718,72 +697,69 @@ export const policyService = {
     try {
       console.log("Cancelando póliza:", policyId)
 
-      // Intentar hacer la petición al servidor
-      try {
-        const response = await api.post(`/policies/${policyId}/cancel`)
-        return response.data
-      } catch (error) {
-        console.error("Error al cancelar póliza en el servidor:", error)
-
-        // Si es un error 404, simular respuesta exitosa para desarrollo
-        if (error.status === 404 || error.isNotFoundError) {
-          console.log("Endpoint de cancelación no encontrado, simulando respuesta exitosa")
-          return {
-            success: true,
-            message: "Póliza cancelada exitosamente",
-            policy_id: policyId,
-            status: "cancelled",
-          }
+      // Verificar que el ID de la póliza sea válido
+      if (!policyId) {
+        throw {
+          message: "ID de póliza no válido",
+          status: 400,
         }
-
-        // Si es un error de autenticación, propagar el error
-        if (error.isAuthError || error.status === 401) {
-          authService.logout()
-          throw error
-        }
-
-        // Si es un error del servidor, simular respuesta exitosa para desarrollo
-        if (error.isServerError || error.code === "NETWORK_ERROR" || error.code === "NO_RESPONSE") {
-          console.log("Error del servidor, simulando respuesta exitosa")
-          return {
-            success: true,
-            message: "Póliza cancelada exitosamente (modo offline)",
-            policy_id: policyId,
-            status: "cancelled",
-          }
-        }
-
-        // Propagar otros errores
-        throw error
       }
+
+      // Usar la ruta correcta con /api/policies
+      const response = await api.post(`/policies/${policyId}/cancel`)
+
+      console.log("Respuesta exitosa de cancelación:", response.data)
+
+      return response.data
     } catch (error) {
-      console.error("Error al cancelar póliza:", error)
+      console.error("Error completo al cancelar póliza:", error)
 
       // Si el error ya tiene un formato estructurado, usarlo directamente
       if (error.message) {
         throw error
       }
 
-      throw { message: "Error al cancelar póliza" }
+      throw {
+        message: "Error inesperado al cancelar la póliza. Por favor, inténtalo de nuevo.",
+        code: "UNEXPECTED_ERROR",
+      }
     }
   },
 
   // Crear una reclamación para una póliza
   createClaim: async (policyId, claimData) => {
     try {
-      const response = await api.post(`/policies/${policyId}/claims`, claimData)
+      console.log("Registrando nuevo siniestro para póliza ID:", policyId, claimData)
+
+      // Corregir la ruta para usar /api/claims en lugar de /claims
+      const response = await api.post(`/api/claims/${policyId}`, claimData)
+      console.log("Respuesta del servidor:", response.data)
       return response.data
     } catch (error) {
+      console.error("Error al crear siniestro:", error)
+
       // Si es un error de autenticación, limpiar datos de sesión
       if (error.isAuthError) {
         authService.logout()
       }
 
-      // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+      // Si es un error 404, simular respuesta exitosa para desarrollo
+      if (error.status === 404 || error.isNotFoundError) {
+        console.log("Endpoint de creación no encontrado, simulando respuesta exitosa")
+        const claimNumber = `CLM-${Date.now().toString().slice(-10)}`
+        return {
+          message: "Siniestro registrado exitosamente (simulado)",
+          claim_id: Math.floor(Math.random() * 1000) + 1,
+          claim_number: claimNumber,
+          status: "submitted",
+        }
+      }
+
+      // Si el error ya tiene un formato estructurado, usarlo directamente
       if (error.message) {
         throw error
       }
-      throw { message: "Error al crear reclamación" }
+      throw { message: "Error al crear siniestro" }
     }
   },
   // Eliminar una póliza
@@ -805,7 +781,7 @@ export const policyService = {
           throw {
             message: "No se pudo eliminar la póliza. La ruta no existe o la póliza ya fue eliminada.",
             status: 404,
-            isNotFoundError: true,
+            isNotFoundError: false,
           }
         }
 
@@ -857,7 +833,113 @@ export const policyService = {
       }
     }
   },
+  // Obtener todos los siniestros del usuario
+  getClaims: async () => {
+    try {
+      // Corregir la ruta para usar /api/claims en lugar de /claims
+      const response = await api.get("/api/claims")
+      return response.data.claims
+    } catch (error) {
+      console.error("Error al obtener siniestros:", error)
+
+      // Si es un error de autenticación, limpiar datos de sesión
+      if (error.isAuthError) {
+        authService.logout()
+      }
+
+      // Si es un error del servidor o de red, devolver datos simulados
+      if (
+        error.isServerError ||
+        error.code === "NETWORK_ERROR" ||
+        error.code === "NO_RESPONSE" ||
+        error.status === 404
+      ) {
+       
+      }
+
+      throw error
+    }
+  },
+
+  // Obtener detalles de un siniestro específico
+  getClaimDetails: async (claimId) => {
+    try {
+      // Corregir la ruta para usar /api/claims en lugar de /claims
+      const response = await api.get(`/api/claims/${claimId}`)
+      console.log("Detalles del siniestro:", response.data)
+      // Si la respuesta no tiene la estructura esperada, transformarla
+      if (response.data && !response.data.claim) {
+        // Si la API devuelve directamente los datos del siniestro sin estructura
+        if (response.data.id || response.data.claim_number) {
+          return {
+            id: response.data.id,
+            claim_number: response.data.claim_number,
+            policy_id: response.data.policy_id,
+            status: response.data.status,
+            details: response.data.details || {},
+            created_at: response.data.created_at || new Date().toISOString(),
+            updated_at: response.data.updated_at || new Date().toISOString(),
+          }
+        }
+      }
+
+      return response.data
+    } catch (error) {
+      console.error("Error al obtener detalles del siniestro:", error)
+
+      // Si es un error de autenticación, limpiar datos de sesión
+      if (error.isAuthError) {
+        authService.logout()
+      }
+
+      // Si es un error del servidor o de red, devolver datos simulados
+      if (
+        error.isServerError ||
+        error.code === "NETWORK_ERROR" ||
+        error.code === "NO_RESPONSE" ||
+        error.status === 404
+      ) {
+       
+        }
+      }
+
+  
+  },
+
+  // Cancelar un siniestro
+  cancelClaim: async (claimId) => {
+    try {
+      // Corregir la ruta para usar /api/claims en lugar de /claims
+      const response = await api.post(`/api/claims/${claimId}/cancel`)
+      return response.data
+    } catch (error) {
+      console.error("Error al cancelar siniestro:", error)
+
+      // Si es un error de autenticación, limpiar datos de sesión
+      if (error.isAuthError) {
+        authService.logout()
+      }
+
+      // Si es un error 404, simular respuesta exitosa para desarrollo
+      if (error.status === 404 || error.isNotFoundError) {
+        console.log("Endpoint de cancelación no encontrado, simulando respuesta exitosa")
+        return {
+          success: true,
+          message: "Siniestro cancelado exitosamente (simulado)",
+          claim_id: claimId,
+          status: "cancelled",
+        }
+      }
+
+      // Si el error ya tiene un formato estructurado, usarlo directamente
+      if (error.message) {
+        throw error
+      }
+      throw { message: "Error al cancelar siniestro" }
+    }
+  },
 }
+
 
 // Actualizar el servicio de administración (solo para usuarios admin)
 export const adminService = {
@@ -925,5 +1007,27 @@ export const adminService = {
     }
   },
 }
+api.paymentService = async () => {
+  try {
+    const response = await api.get("/payments")
+    return response.data.payments
+  } catch (error) {
+    console.error("Error al obtener pagos:", error)
+
+    // Si es un error de autenticación, limpiar datos de sesión
+    if (error.isAuthError) {
+      authService.logout()
+    }
+
+    // Si el error ya tiene un formato estructurado (de nuestro interceptor), usarlo directamente
+    if (error.message) {
+      throw error
+    }
+    throw { message: "Error al obtener pagos" }
+  }
+}
+
+
+
 
 export default api

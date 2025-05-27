@@ -66,12 +66,12 @@ function PolicyCard({ policy, onPolicyUpdate, onPolicyDelete }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
-  const status = statusConfig[policy.status] || statusConfig.pending
+  const status = statusConfig[policy.status] || statusConfig.active
   const StatusIcon = status.icon
 
   const handlePolicyCancelled = (policyId) => {
     // Actualizar el estado de la póliza localmente
-    const updatedPolicy = { ...policy, status: "cancelled" }
+    const updatedPolicy = { ...policyid, status: "cancelled" }
 
     // Notificar al componente padre
     if (onPolicyUpdate) {

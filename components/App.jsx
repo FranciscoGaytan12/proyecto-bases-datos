@@ -18,6 +18,7 @@ import ProfilePage from "./profile-page"
 import Dashboard from "./Dashboard"
 // Importar el componente AdminPanel
 import AdminPanel from "./AdminPanel"
+import Coments from "./Coments"
 
 function App() {
   const { scrollYProgress } = useScroll()
@@ -323,6 +324,7 @@ function App() {
 
       <Footer />
 
+  
       {/* Modal de inicio de sesión */}
       <Login
         isOpen={isLoginOpen}

@@ -27,20 +27,33 @@ function generateClaimNumber() {
 
 /**
  * Calcula el estado de una póliza basado en sus fechas
- * @param {Date} startDate - Fecha de inicio de la póliza
- * @param {Date} endDate - Fecha de fin de la póliza
+ * @param {Date|string} startDate - Fecha de inicio de la póliza
+ * @param {Date|string} endDate - Fecha de fin de la póliza
  * @returns {string} Estado de la póliza ('active', 'expired', 'pending')
  */
 function calculatePolicyStatus(startDate, endDate) {
   const now = new Date()
-  const start = new Date(startDate)
-  const end = new Date(endDate)
+  // Asegurarse de que las fechas son objetos Date
+  const start = startDate instanceof Date ? startDate : new Date(startDate)
+  const end = endDate instanceof Date ? endDate : new Date(endDate)
+
+  // Eliminar la hora para comparar
+  now.setHours(0, 0, 0, 0)
+  start.setHours(0, 0, 0, 0)
+  end.setHours(0, 0, 0, 0)
+
+  console.log(
+    `Calculando estado de póliza - Fecha actual: ${now.toISOString()}, Inicio: ${start.toISOString()}, Fin: ${end.toISOString()}`,
+  )
 
   if (now < start) {
+    console.log("Estado: pending (la fecha actual es anterior a la fecha de inicio)")
     return "pending"
   } else if (now > end) {
+    console.log("Estado: expired (la fecha actual es posterior a la fecha de fin)")
     return "expired"
   } else {
+    console.log("Estado: active (la fecha actual está entre la fecha de inicio y fin)")
     return "active"
   }
 }
@@ -115,4 +128,3 @@ module.exports = {
   calculatePolicyStatus,
   validatePolicyData,
 }
-

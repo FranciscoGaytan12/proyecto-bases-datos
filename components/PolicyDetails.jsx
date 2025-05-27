@@ -103,6 +103,7 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
   const [cancelling, setCancelling] = useState(false)
   const [cancelSuccess, setCancelSuccess] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
+  const [debugInfo, setDebugInfo] = useState(null)
 
   // Función para cargar los detalles de la póliza
   const fetchPolicyDetails = async () => {
@@ -158,12 +159,35 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
   const handleCancelPolicy = async () => {
     try {
       setCancelling(true)
+      setError(null)
+      setDebugInfo(null)
+
+      console.log(`Intentando cancelar póliza ID: ${policyId}`)
+
+      // Verificar que el ID de la póliza sea válido
+      if (!policyId || isNaN(policyId)) {
+        throw new Error("ID de póliza no válido")
+      }
 
       // Llamar al servicio para cancelar la póliza
-      await policyService.cancelPolicy(policyId)
+      const response = await policyService.cancelPolicy(policyId)
+
+      console.log("Respuesta de cancelación:", response)
+
+      // Verificar si la respuesta es válida
+      if (!response) {
+        throw new Error("No se recibió respuesta del servidor al cancelar la póliza")
+      }
 
       // Mostrar mensaje de éxito
       setCancelSuccess(true)
+      console.log(`Póliza ID: ${policyId} cancelada exitosamente`)
+
+      // Actualizar el estado de la póliza en el componente
+      setPolicy((prev) => ({
+        ...prev,
+        status: "cancelled",
+      }))
 
       // Notificar al componente padre que la póliza fue cancelada
       if (onPolicyCancelled) {
@@ -174,10 +198,53 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
     } catch (err) {
       console.error("Error al cancelar la póliza:", err)
 
-      // Use our error handler utility
-      handleApiError(err, setError, setCancelling, false)
+      // Guardar información de depuración
+      setDebugInfo({
+        error: err,
+        message: err.message,
+        status: err.status,
+        code: err.code,
+        data: err.data,
+        policyId: policyId,
+        timestamp: new Date().toISOString(),
+      })
+
+      // Mostrar mensaje de error específico basado en el código de error
+      if (err.error_code === "POLICY_NOT_FOUND") {
+        setError(`La póliza con ID ${policyId} no existe en el sistema. Puede haber sido eliminada previamente.`)
+      } else if (err.error_code === "POLICY_ACCESS_DENIED") {
+        setError("No tienes permiso para cancelar esta póliza.")
+      } else if (err.error_code === "INVALID_POLICY_STATUS") {
+        setError(
+          `Esta póliza no se puede cancelar porque su estado actual es '${err.current_status}'. Solo se pueden cancelar pólizas activas.`,
+        )
+      } else if (err.status === 400) {
+        setError(err.message || "Solo se pueden cancelar pólizas activas.")
+      } else if (err.status === 404) {
+        setError(`La póliza con ID ${policyId} no existe o ya ha sido eliminada del sistema.`)
+      } else if (err.status === 401 || err.status === 403) {
+        setError("No tienes permiso para cancelar esta póliza. Por favor, inicia sesión nuevamente.")
+      } else {
+        setError("Error al cancelar la póliza. Por favor, inténtalo de nuevo más tarde.")
+      }
     } finally {
       setCancelling(false)
+    }
+  }
+
+  // Función para forzar la cancelación (solo para desarrollo)
+  const forceCancel = () => {
+    setCancelSuccess(true)
+    setPolicy((prev) => ({
+      ...prev,
+      status: "cancelled",
+    }))
+
+    // Notificar al componente padre
+    if (onPolicyCancelled) {
+      setTimeout(() => {
+        onPolicyCancelled(policyId)
+      }, 2000)
     }
   }
 
@@ -275,6 +342,16 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
                 Cerrar
               </button>
             </div>
+
+            {/* Información de depuración (solo en desarrollo) */}
+            {process.env.NODE_ENV === "development" && debugInfo && (
+              <div className="mt-6 p-4 bg-gray-100 rounded-md text-left">
+                <h4 className="font-medium text-gray-800 mb-2">Información de depuración:</h4>
+                <pre className="text-xs overflow-auto max-h-40 p-2 bg-gray-200 rounded">
+                  {JSON.stringify(debugInfo, null, 2)}
+                </pre>
+              </div>
+            )}
           </div>
         ) : cancelSuccess ? (
           <div className="p-8 text-center">
@@ -506,6 +583,17 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
                 <button className="px-4 py-2 bg-blue-400 text-white rounded-md hover:bg-blue-500" onClick={onClose}>
                   Cerrar
                 </button>
+
+                {/* Botón de forzar cancelación (solo en desarrollo) */}
+                {process.env.NODE_ENV === "development" && policy.status === "active" && (
+                  <button
+                    className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
+                    onClick={forceCancel}
+                    title="Solo para desarrollo"
+                  >
+                    Forzar Cancelación
+                  </button>
+                )}
               </div>
             </div>
 
@@ -514,13 +602,17 @@ function PolicyDetails({ policyId, onClose, onPolicyCancelled }) {
               <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
                 <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirmar Cancelación</h3>
+                  {error && <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md">{error}</div>}
                   <p className="text-gray-600 mb-6">
                     ¿Estás seguro de que deseas cancelar esta póliza? Esta acción no se puede deshacer.
                   </p>
                   <div className="flex justify-end space-x-4">
                     <button
                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-                      onClick={() => setShowCancelConfirm(false)}
+                      onClick={() => {
+                        setShowCancelConfirm(false)
+                        setError(null)
+                      }}
                       disabled={cancelling}
                     >
                       No, Mantener Póliza
@@ -627,5 +719,7 @@ function getPaymentStatusLabel(status) {
   }
   return statusLabels[status] || "Desconocido"
 }
+
+
 
 export default PolicyDetails

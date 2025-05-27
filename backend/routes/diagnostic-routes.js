@@ -15,7 +15,7 @@ router.get("/health", async (req, res) => {
       environment: {
    
         DB_HOST: process.env.DB_HOST || "localhost",
-        DB_PORT: process.env.DB_PORT || 3307,
+        DB_PORT: process.env.DB_PORT || 3306,
         DB_NAME: process.env.DB_NAME || "segurototal",
         DB_USER: process.env.DB_USER || "root",
         // No mostrar la contraseña por seguridad
@@ -51,7 +51,7 @@ router.get("/db-test", async (req, res) => {
       result,
       config: {
         host: process.env.DB_HOST || "localhost",
-        port: process.env.DB_PORT || 3307,
+        port: process.env.DB_PORT || 3306,
         database: process.env.DB_NAME || "segutotal",
         user: process.env.DB_USER || "root",
       },
@@ -65,7 +65,7 @@ router.get("/db-test", async (req, res) => {
       error: error.message,
       config: {
         host: process.env.DB_HOST || "localhost",
-        port: process.env.DB_PORT || 3307,
+        port: process.env.DB_PORT || 3306,
         database: process.env.DB_NAME || "segutotal",
         user: process.env.DB_USER || "root",
       },

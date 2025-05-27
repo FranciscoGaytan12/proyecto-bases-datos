@@ -71,9 +71,35 @@ CREATE TABLE IF NOT EXISTS payments (
   FOREIGN KEY (policy_id) REFERENCES policies(id) ON DELETE CASCADE
 );
 
+-- Crear tabla de fotos de siniestros
+CREATE TABLE IF NOT EXISTS claim_photos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  claim_id INT NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  file_path VARCHAR(500) NOT NULL,
+  file_type VARCHAR(100) NOT NULL,
+  file_size INT NOT NULL,
+  description TEXT,
+  uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (claim_id) REFERENCES claims(id) ON DELETE CASCADE
+);
+
+-- Crear tabla de actualizaciones de siniestros
+CREATE TABLE IF NOT EXISTS claim_updates (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  claim_id INT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  status_before VARCHAR(50),
+  status_after VARCHAR(50) NOT NULL,
+  updated_by INT NOT NULL,
+  update_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (claim_id) REFERENCES claims(id) ON DELETE CASCADE,
+  FOREIGN KEY (updated_by) REFERENCES users(id)
+);
+
 -- Insertar algunos datos de ejemplo
 INSERT INTO users (email, password, name) VALUES
 ('admin@segurototal.com', '$2b$10$X7KAdjZq8VN7A.k5E4QIAOk/HSOkzR.Hl5JQwGdmWUKyb8vTUvhie', 'Administrador'), -- contraseña: admin123
 ('usuario@ejemplo.com', '$2b$10$NlUO.wSH3TS1UUJPi1QOqOSbmXG7FwNjQ9l5FrKEEMaUIPvFwQXcO', 'Usuario Ejemplo'); -- contraseña: password123
 
-  

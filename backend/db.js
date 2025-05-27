@@ -8,7 +8,7 @@ dotenv.config()
 // Configuración del pool de conexiones
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "127.0.0.1",
-  port: Number.parseInt(process.env.DB_PORT || "3307", 10), 
+  port: Number.parseInt(process.env.DB_PORT || "3306", 10), 
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "Puertas78.",
   database: process.env.DB_NAME || "segurototal",
@@ -27,7 +27,7 @@ async function checkDatabaseConnection() {
   try {
     const connection = await pool.getConnection()
     console.log("✅ Conexión a MySQL establecida correctamente")
-    console.log(`✅ Conectado a: ${process.env.DB_HOST}:${process.env.DB_PORT || 3307}`)
+    console.log(`✅ Conectado a: ${process.env.DB_HOST}:${process.env.DB_PORT || "3306"}`)
     console.log(`✅ Base de datos: ${process.env.DB_NAME || "segurototal"}`)
     connection.release()
     return true
@@ -114,9 +114,22 @@ async function initializeDatabase() {
         payment_method ENUM('credit_card', 'debit_card', 'bank_transfer', 'cash') NOT NULL,
         transaction_id VARCHAR(100) NULL,
         status ENUM('pending', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
+        card_last_four VARCHAR(4),
+        card_holder VARCHAR(100),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (policy_id) REFERENCES policies(id) ON DELETE CASCADE
+      )
+    `)
+
+    // Crear tabla de comentarios si no existe
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS comments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        comment TEXT NOT NULL,
+        reference VARCHAR(255),
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `)
 
@@ -127,10 +140,9 @@ async function initializeDatabase() {
     if (users[0].count === 0) {
       const bcrypt = require("bcryptjs")
       const hashedPassword = await bcrypt.hash("admin123", 10)
-
       await connection.query(
         `
-        INSERT INTO users (email, password, name, roles) 
+        INSERT INTO users (email, password, name, role) 
         VALUES ('admin@segurototal.com', ?, 'Administrador', 'admin')
       `,
         [hashedPassword],

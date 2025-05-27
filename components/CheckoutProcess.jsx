@@ -12,6 +12,7 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
     expiry_date: "",
     cvv: "",
     payment_method: "credit_card",
+    save_card: false
   })
 
   const [errors, setErrors] = useState({})
@@ -123,6 +124,13 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (!policyData || !policyData.id) {
+      setErrors({
+        form: "Error: No se puede procesar el pago sin los datos de la póliza"
+      });
+      return;
+    }
+
     if (validatePaymentForm()) {
       try {
         setIsLoading(true)
@@ -130,7 +138,7 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
         // Crear objeto de pago para la base de datos
         const paymentRecord = {
           policy_id: policyData.id,
-          amount: policyData.premium * 1.21, // Incluir impuestos
+          amount: policyData.premium * 1.21,
           payment_date: new Date().toISOString(),
           payment_method: paymentData.payment_method,
           transaction_id: `TR-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
@@ -146,12 +154,19 @@ function CheckoutProcess({ policyData, onComplete, onCancel }) {
         console.log("Guardando pago en la base de datos:", paymentRecord)
 
         // Guardar el pago en la base de datos
+        let paymentResult;
         try {
-          const result = await paymentService.createPayment(paymentRecord)
-          console.log("Pago guardado exitosamente:", result)
+          paymentResult = await paymentService.createPayment(paymentRecord)
+          if (!paymentResult || !paymentResult.id) {
+            throw new Error("No se recibió una confirmación válida del pago")
+          }
+          console.log("Pago guardado exitosamente:", paymentResult)
         } catch (dbError) {
           console.error("Error al guardar el pago en la base de datos:", dbError)
-          // Continuar con el proceso aunque falle el guardado en la base de datos
+          setErrors({
+            form: "Error al procesar el pago: " + (dbError.message || "No se pudo guardar el pago")
+          });
+          return;
         }
 
         // Simular procesamiento de pago (para desarrollo)
