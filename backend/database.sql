@@ -98,6 +98,21 @@ CREATE TABLE IF NOT EXISTS claim_updates (
   FOREIGN KEY (updated_by) REFERENCES users(id)
 );
 
+-- Crear tabla de agentes de seguros
+CREATE TABLE IF NOT EXISTS seguros_agentes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(255) NOT NULL,
+  apellido VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  telefono VARCHAR(20) NOT NULL,
+  especialidad ENUM('auto', 'home', 'life', 'health', 'travel', 'business') NOT NULL,
+  num_licencia VARCHAR(50) NOT NULL UNIQUE,
+  fecha_contratacion DATE NOT NULL,
+  estado ENUM('activo', 'inactivo', 'suspendido') NOT NULL DEFAULT 'activo',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- Insertar algunos datos de ejemplo
 INSERT INTO users (email, password, name) VALUES
 ('admin@segurototal.com', '$2b$10$X7KAdjZq8VN7A.k5E4QIAOk/HSOkzR.Hl5JQwGdmWUKyb8vTUvhie', 'Administrador'), -- contraseña: admin123

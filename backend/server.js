@@ -6,6 +6,9 @@ const jwt = require("jsonwebtoken")
 const dotenv = require("dotenv")
 const db = require("./db")
 
+// Importar rutas
+const agentesRoutes = require('./routes/agentes-routes');
+
 // Cargar variables de entorno
 dotenv.config()
 
@@ -22,6 +25,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 app.use(express.json())
+
+// Rutas
+app.use('/api/agentes', agentesRoutes);
 
 // Middleware para mostrar información de las peticiones
 app.use((req, res, next) => {
