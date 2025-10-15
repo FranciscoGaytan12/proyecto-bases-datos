@@ -42,7 +42,7 @@ function Register({ isOpen, onClose, onLoginClick }) {
     if (!password) {
       newErrors.password = "La contraseña es requerida"
     } else if (password.length < 6) {
-      newErrors.password = "La contraseña debe tener al menos 6 caracteres"
+      newErrors.password = "La contraseña debe tener al menos 8 caracteres"
     }
 
     if (password !== confirmPassword) {
